@@ -8,6 +8,7 @@ var auction = require('./auction');
 var lottery = require('./lottery');
 var item = require('./item');
 var tax = require('./tax');
+var user = require('./user');
 /***
  * common apis
  */
@@ -18,6 +19,7 @@ router.get("/governor/all", governor.all);
  */
 router.post("/message/send", message.send);
 router.post("/governor/update", governor.update);
+router.post("/governor/updateTax", governor.updateTax);
 
 /***
  * app apis
@@ -53,5 +55,7 @@ router.post("/item/post", item.post);
 router.get("/item/get", item.get);
 router.post("/item/buy", item.buy);
 router.get("/item/track", item.track);
+
+router.post("/user/post", user.post);
 
 module.exports = router;

@@ -4,13 +4,13 @@
 }
 
 .govWrapper {
-    width: 40%;
+    width: 50%;
     display: flex;
     flex-direction: column;
 }
 
 .ddWrapper {
-    width: 30%;
+    width: 20%;
     display: flex;
     flex-direction: column;
 }
@@ -24,7 +24,26 @@
 }
 
 .chatWrapper {
-    width: 40%;
+    width: 30%;
     display: flex;
     flex-direction: column;
+}
+div.rt-td, div.rt-th { 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+div.rt-th{
+    word-wrap: break-word !important;
+    white-space: pre-wrap !important;
+}
+.form-control {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin: 15px 0;
+}
+.form-label {
+    color: #ffffff;
 }

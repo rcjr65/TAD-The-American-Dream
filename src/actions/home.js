@@ -103,10 +103,10 @@ export function loadGovAndTax() {
   };
 }
 
-export function updateGov(id, userName) {
+export function updateGov(params) {
   return async (dispatch, getState) => {
     try {
-      var governors = await ApiProvider(Backend_EndPoint + "api/governor/update/", "POST", {id, userName});
+      var governors = await ApiProvider(Backend_EndPoint + "api/governor/update/", "POST", params);
       dispatch({
         type: HOME_UPDATE_GOV,
         payload: governors.payload
@@ -120,20 +120,43 @@ export function updateGov(id, userName) {
   };
 }
 
-export function updateTax(index, value) {
+export function updateGovTax(params) {
   return async (dispatch, getState) => {
     try {
-      var tax = index == 1? await ApiProvider(Backend_EndPoint + "api/tax/setTadTax/", "POST", {
+      var governors = await ApiProvider(Backend_EndPoint + "api/governor/updateTax/", "POST", params);
+
+      dispatch({
+        type: HOME_UPDATE_GOV,
+        payload: governors.payload
+      });
+    } catch (error) {
+      dispatch({
+        type: HOME_ERROR,
+        payload: error
+      });
+    };
+  };
+}
+
+export function updateTax(value) {
+  return async (dispatch, getState) => {
+    try {
+      await ApiProvider(Backend_EndPoint + "api/tax/setTadTax/", "POST", {
         tadTax: value,
       }) 
-      : await ApiProvider(Backend_EndPoint + "api/tax/setGovTax/", "POST", {
+      
+      await ApiProvider(Backend_EndPoint + "api/tax/setGovTax/", "POST", {
         govTax: value,
       });
+      
+      var governors = await ApiProvider(Backend_EndPoint + "api/governor/all/", "GET", null);
+
       dispatch({
         type: HOME_UPDATE_TAX,
         payload: {
-          tax: value,
-          index,
+          governors: governors.payload,
+          govTax: value,
+          tadTax: value
         }
       });
     } catch (error) {

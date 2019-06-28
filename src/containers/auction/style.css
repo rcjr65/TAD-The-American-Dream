@@ -4,14 +4,16 @@
 .form-group {
     padding: 20px 10px;
 }
-.form-control {
+.form-controls {
     display: flex;
     flex-direction: row;
     align-items: center;
     margin: 15px 0;
 }
-.form-label {
+.form-labels {
+    flex: 1;
     color: #ffffff;
+    text-align: right;
 }
 .Dropdown-control {
     

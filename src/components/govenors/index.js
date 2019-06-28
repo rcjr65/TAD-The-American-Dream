@@ -45,6 +45,24 @@ export default class Govenors extends Component {
                         accessor: 'userName'
                     },
                     {
+                        Header: 'GOV TAX(%)',
+                        accessor: 'govTax',
+                        width: 80
+                    },
+                    {
+                        Header: 'TAD TAX(%)',
+                        accessor: 'tadTax',
+                        width: 80
+                    },
+                    {
+                        Header: 'POPULATION',
+                        accessor: 'population'
+                    },
+                    {
+                        Header: 'MOST POPULAR GROUP',
+                        accessor: 'mostPopularGroup'
+                    },
+                    {
                         Header: 'ACTION',
                         Cell: this.actionGovCell
                     },

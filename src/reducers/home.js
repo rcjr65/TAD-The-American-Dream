@@ -41,18 +41,12 @@ const home = (state = defaultState, action) => {
       governors: action.payload,
     };
   case HOME_UPDATE_TAX:
-    if(action.payload.index == 1 ){
-      return {
-        ...state,
-        tadTax: action.payload.tax,
-      };
-    }
-    else{
-      return {
-        ...state,
-        govTax: action.payload.tax,
-      };
-    }    
+    return {
+      ...state,
+      govTax: action.payload.govTax,
+      tadTax: action.payload.tadTax,
+      governors: action.payload.governors,
+    };
   case HOME_ERROR:
     alert(action.payload);
     return {

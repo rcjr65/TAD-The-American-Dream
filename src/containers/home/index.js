@@ -7,7 +7,7 @@ import { faEdit, faSave, faTrash } from '@fortawesome/free-solid-svg-icons';
 library.add(faEdit, faSave, faTrash);
 import ReactModal from 'react-modal';
 
-import {web3connect, initContract, fetchContracts, loadGovAndTax, updateGov, updateTax, postMessage } from '../../actions/home';
+import {web3connect, initContract, fetchContracts, loadGovAndTax, updateGov, updateGovTax, updateTax, postMessage } from '../../actions/home';
 import Govenors from '../../components/govenors';
 import Taxation from '../../components/taxation';
 import Currency from '../../components/currency';
@@ -20,17 +20,19 @@ import './style.css';
 
 const customStyles = {
   overlay: { 
-    backgroundColor: "rgba(0,0,0,0.2)"
+    backgroundColor: 'rgba(0,0,0,0.2)'
   },
   content : {
-    color: "white", 
-    backgroundColor: "rgba(0,0,0,0.8)", 
-    margin: "15% calc(15% - 60px)", 
-    width: "70%", 
-    height: "35%", 
-    border: "none", 
-    borderRadius: "5px", 
-    textAlign: "center",    
+    display: 'flex',
+    flexDirection: 'column',
+    color: 'white', 
+    backgroundColor: 'rgba(0,0,0,0.8)', 
+    margin: '15% calc(15% - 60px)', 
+    width: '50%', 
+    height: '35%', 
+    border: 'none', 
+    borderRadius: '5px', 
+    alignItems: 'center', 
   }
 };
 
@@ -44,14 +46,19 @@ class Home extends Component {
       isTaxOpen: false,
       taxIndex: 1,
       userName: '',
+      userCode: '',
+      userData: [],
+      isNew: false,
+      govTax: 0,
+      tadTax: 0,
       govId: null,
       taxValue: null,
       addAmount: 0,
       exchangeValues: [
-        { currency: "USD", price: 5 }
-        // { currency: "GBP", price: 5 },
-        // { currency: "VND", price: 5 },
-        // { currency: "AUD", price: 5 }
+        { currency: 'USD', price: 5 }
+        // { currency: 'GBP', price: 5 },
+        // { currency: 'VND', price: 5 },
+        // { currency: 'AUD', price: 5 }
       ]
     }
   }
@@ -76,10 +83,24 @@ class Home extends Component {
 
   btnChange = (e) => {
     if( e == 0){
-      this.props.updateGov(this.state.govId, this.state.userName);      
+      console.log("state => ", this.state)
+      var params = {
+        id: this.state.govId,
+        userCode: this.state.userCode,
+        userName: this.state.userName,
+        govTax: this.state.govTax,
+        tadTax: this.state.tadTax,
+        isNew: this.state.isNew
+      }
+      if( (this.state.userData.userCode == this.state.userCode && this.state.isNew == true) || (this.state.userData.userName == this.state.userName && this.state.isNew == false)){
+        this.props.updateGovTax(params);
+      }
+      else {
+        this.props.updateGov(params);
+      }      
     }
     else{
-      this.props.updateTax(this.state.taxIndex, this.state.taxValue);
+      this.props.updateTax(this.state.taxValue);
     }
 
     this.handleCloseModal(e);
@@ -91,7 +112,13 @@ class Home extends Component {
 
   handleOpen = (e, param) => {
     if(e == 0 ){
-      this.setState({isGovOpen: true, userName: param.userName, govId: param._id});
+      this.setState({isGovOpen: true, userData: param, userCode:param.userCode, userName: param.userName, govTax: param.govTax, tadTax: param.tadTax, govId: param._id});
+      if(param.userCode == ''){
+        this.setState({isNew: true})
+      }
+      else{
+        this.setState({isNew: false})
+      }
     }
     else{
       this.setState({isTaxOpen: true, taxIndex: e, taxValue: param});
@@ -123,21 +150,21 @@ class Home extends Component {
           <Taxation govTax={this.props.govTax} tadTax={this.props.tadTax} handleOpen={(e, param)=>this.handleOpen(e, param)} />
         </div>
         <div className='ddWrapper'>
-          <div className="box">
+          <div className='box'>
             <h2>DD IN CIRCULATION</h2>
-            <h3> { parseInt(this.state.totalSupply, 10).toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-              <span style={{color:"#d8d51a"}}>&nbsp;&nbsp;DD</span>
+            <h3> { parseInt(this.state.totalSupply, 10).toFixed(0).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              <span style={{color:'#d8d51a'}}>&nbsp;&nbsp;DD</span>
             </h3>
             <h3>
-              <span style={{color:"#d8d51a"}}>$&nbsp;&nbsp;</span>
-              {(parseInt(this.state.totalSupply, 10) * parseInt(this.state.exchangeValues[0].price, 10)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+              <span style={{color:'#d8d51a'}}>$&nbsp;&nbsp;</span>
+              {(parseInt(this.state.totalSupply, 10) * parseInt(this.state.exchangeValues[0].price, 10)).toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
             </h3>
           </div>
 
-          <div className="box">
+          <div className='box'>
             <h2>CREATE DD</h2>
-            <div style={{ padding: "5px", textAlign: "center" }}>
-              <input onChange={(e)=>this.setState({addAmount: e.target.value})} value={this.state.addAmount} style={{ backgroundColor: "grey", border: "none", borderRadius: "4px" }} />
+            <div style={{ padding: '5px', textAlign: 'center' }}>
+              <input onChange={(e)=>this.setState({addAmount: e.target.value})} value={this.state.addAmount} style={{ backgroundColor: 'grey', border: 'none', borderRadius: '4px' }} />
               <br />
               <br /> <button onClick={()=>this.addSupply()}>ADD</button>
             </div>
@@ -150,22 +177,49 @@ class Home extends Component {
         <ReactModal
             isOpen={this.state.isGovOpen}
             onRequestClose={()=>this.handleCloseModal(0)}
-            contentLabel="Controls"
+            contentLabel='Controls'
             style={customStyles}
             ariaHideApp={false}
           >
-          <h2>Set GOVERNOR'S NAME</h2>
-          <input
-            onChange={(event)=>this.setState({ userName: event.target.value})}
-            value={this.state.userName}
-            style={{ backgroundColor: "grey", border: "none", borderRadius: "4px", padding: 10, width:"50%" }} />
-          <br />
+          <h2>Set GOVERNOR</h2>
+          {
+            this.state.isNew ?
+              <div className='form-controls'>
+                  <span className='form-labels'>Governor Code:&nbsp;</span>
+                  <input
+                    onChange={(event)=>this.setState({ userCode: event.target.value})}
+                    value={this.state.userCode}
+                    style={{ backgroundColor: 'grey', border: 'none', borderRadius: '4px', padding: 10, width:'50%' }} />
+              </div>              
+              : <div className='form-controls'>
+                    <span className='form-labels'>Governor Name:&nbsp;</span>
+                    <input
+                      onChange={(event)=>this.setState({ userName: event.target.value})}
+                      value={this.state.userName}
+                      style={{ backgroundColor: 'grey', border: 'none', borderRadius: '4px', padding: 10, width:'50%' }} />
+                </div>             
+          }
+          
+          <div className='form-controls'>
+              <span className='form-labels'>Gov Tax:&nbsp;</span>
+              <input
+                onChange={(event)=>this.setState({ govTax: event.target.value})}
+                value={this.state.govTax}
+                style={{ backgroundColor: 'grey', border: 'none', borderRadius: '4px', padding: 10, width:'50%' }} />
+          </div>
+          <div className='form-controls'>
+              <span className='form-labels'>Tad Tax:&nbsp;</span>
+              <input
+                onChange={(event)=>this.setState({ tadTax: event.target.value})}
+                value={this.state.tadTax}
+                style={{ backgroundColor: 'grey', border: 'none', borderRadius: '4px', padding: 10, width:'50%' }} />
+          </div>
           <button className='btnModal' onClick={() => this.btnChange(0)}>SET</button>
         </ReactModal>
         <ReactModal
             isOpen={this.state.isTaxOpen}
             onRequestClose={()=>this.handleCloseModal(this.state.taxIndex)}
-            contentLabel="Controls"
+            contentLabel='Controls'
             style={customStyles}
             ariaHideApp={false}
           >
@@ -173,7 +227,7 @@ class Home extends Component {
           <input
             onChange={(event)=>this.setState({ taxValue: event.target.value})}
             value={this.state.taxValue}
-            style={{ backgroundColor: "grey", border: "none", borderRadius: "4px", padding: 10, width:"50%" }} />
+            style={{ backgroundColor: 'grey', border: 'none', borderRadius: '4px', padding: 10, width:'50%' }} />
           <br />
           <button className='btnModal' onClick={() => this.btnChange(this.state.taxIndex)}>SET</button>
         </ReactModal>
@@ -188,6 +242,7 @@ const mapDispatchToProps = {
   fetchContracts,
   loadGovAndTax,
   updateGov,
+  updateGovTax,
   updateTax,
   postMessage,
 };

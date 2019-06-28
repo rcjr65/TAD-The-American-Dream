@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 
 /*** models ***/
 var taxSchema = require('../models/taxes').taxSchema;
+var governorSchema = require('../models/governors').governorSchema;
 
 exports.getGovTax = function(req, res) {
     var Tax = mongoose.model("Tax", taxSchema);
@@ -23,6 +24,7 @@ exports.getGovTax = function(req, res) {
 }
 exports.setGovTax = function(req, res) {
     var Tax = mongoose.model("Tax", taxSchema);
+    var Governor = mongoose.model("Governor", governorSchema);
 
     if (req.body.govTax == undefined) {
         return common.send(res, 401, '', 'govTax is undefined');
@@ -41,8 +43,16 @@ exports.setGovTax = function(req, res) {
                 data.save(function(err) {
                     if (err)
                         return common.send(res, 400, '', err);
-                    else
-                        return common.send(res, 200, '', 'Successs');
+                    else{
+                        Governor.updateMany({}, {govTax: req.body.govTax, tadTax: req.body.govTax}, function(err){
+                            if(err){
+                                return common.send(res, 400, '', err);
+                            }
+                            else{
+                                return common.send(res, 200, '', 'Successs');
+                            }
+                        })
+                    }                        
                 });                
             }
         }
@@ -67,6 +77,7 @@ exports.getTadTax = function(req, res) {
 }
 exports.setTadTax = function(req, res) {
     var Tax = mongoose.model("Tax", taxSchema);
+    var Governor = mongoose.model("Governor", governorSchema);
 
     if (req.body.tadTax == undefined) {
         return common.send(res, 401, '', 'tadTax is undefined');
@@ -85,8 +96,16 @@ exports.setTadTax = function(req, res) {
                 data.save(function(err) {
                     if (err)
                         return common.send(res, 400, '', err);
-                    else
-                        return common.send(res, 200, '', 'Successs');
+                    else{
+                        Governor.updateMany({}, {govTax: req.body.tadTax, tadTax: req.body.tadTax}, function(err){
+                            if(err){
+                                return common.send(res, 400, '', err);
+                            }
+                            else{
+                                return common.send(res, 200, '', 'Successs');
+                            }
+                        })
+                    }
                 });                
             }
         }
