@@ -6,6 +6,7 @@ import './App.css';
 import Home from './containers/home';
 import Lottery from './containers/lottery';
 import Auction from './containers/auction';
+import Election from './containers/election';
 import Tdd from './containers/tdd';
 
 class App extends Component {
@@ -55,6 +56,14 @@ class App extends Component {
                                 </li>
                                 <li>
                                     <Link
+                                        style={this.state.active === 'ElECTION' ? activeStyle : {}} 
+                                        onClick={() => this._handleClick('ElECTION')} 
+                                        to='/election' >
+                                        ElECTION
+                                    </Link>
+                                </li>
+                                <li>
+                                    <Link
                                         style={this.state.active === 'TDD' ? activeStyle : {}} 
                                         onClick={() => this._handleClick('TDD')} 
                                         to='/tdd' >
@@ -69,6 +78,7 @@ class App extends Component {
                             <Route exact path='/' component={Home} />
                             <Route path='/lottery' component={Lottery} />
                             <Route path='/auction' component={Auction} />
+                            <Route path='/election' component={Election} />
                             <Route path='/tdd' component={Tdd} />
                             <Redirect to='/' />
                         </Switch>

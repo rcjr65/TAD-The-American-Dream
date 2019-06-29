@@ -79,11 +79,11 @@ exports.result = function(req, res) {
 exports.setPeroid = function(req, res){
     var Elections = mongoose.model("Elections", electionSchema);
     var Votes = mongoose.model("Votes", voteSchema);
-    if (req.body.startTime == undefined) {
+    if (req.body.startTime == undefined || req.body.startTime == '') {
         return common.send(res, 401, '', 'startTime is undefined');
     }
 
-    if (req.body.endTime == undefined) {
+    if (req.body.endTime == undefined || req.body.endTime == '') {
         return common.send(res, 401, '', 'endTime is undefined');
     }
 
@@ -92,11 +92,11 @@ exports.setPeroid = function(req, res){
             return common.send(res, 400, '', err);
         }
         else{
-            Votes.remove({}, function(err){
-                if(err){
-                    return common.send(res, 400, '', err);
-                }
-                else{
+            // Votes.remove({}, function(err){
+            //     if(err){
+            //         return common.send(res, 400, '', err);
+            //     }
+            //     else{
                     var _temp = {};
                     _temp.startTime = req.body.startTime;
                     _temp.endTime = req.body.endTime;            
@@ -108,8 +108,8 @@ exports.setPeroid = function(req, res){
                             return common.send(res, 200, data, 'Success');
                         }
                     });
-                }
-            });
+            //     }
+            // });
         }
     });
 }
