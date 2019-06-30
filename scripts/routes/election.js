@@ -76,7 +76,7 @@ exports.result = function(req, res) {
     })
 }
 
-exports.setPeroid = function(req, res){
+exports.setPeriod = function(req, res){
     var Elections = mongoose.model("Elections", electionSchema);
     var Votes = mongoose.model("Votes", voteSchema);
     if (req.body.startTime == undefined || req.body.startTime == '') {
@@ -86,7 +86,7 @@ exports.setPeroid = function(req, res){
     if (req.body.endTime == undefined || req.body.endTime == '') {
         return common.send(res, 401, '', 'endTime is undefined');
     }
-
+    
     Elections.remove({}, function(err){
         if(err){
             return common.send(res, 400, '', err);
@@ -98,9 +98,9 @@ exports.setPeroid = function(req, res){
             //     }
             //     else{
                     var _temp = {};
-                    _temp.startTime = req.body.startTime;
-                    _temp.endTime = req.body.endTime;            
-
+                    _temp.startTime = Math.floor(new Date(req.body.startTime).getTime()/1000);
+                    _temp.endTime = Math.floor(new Date(req.body.endTime).getTime()/1000);
+                    
                     Elections.insertMany(_temp, function (err, data) {
                         if (err){ 
                             return common.send(res, 400, '', err);
@@ -114,7 +114,7 @@ exports.setPeroid = function(req, res){
     });
 }
 
-exports.getPeroid = function(req, res){
+exports.getPeriod = function(req, res){
     var Elections = mongoose.model("Elections", electionSchema);
 
     Elections.find({}, ['startTime', 'endTime']).exec(function(err, data) {

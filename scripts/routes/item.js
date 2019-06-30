@@ -168,7 +168,7 @@ exports.buy =  function(req, res) {
 
 exports.track =  function(req, res) {
     var Track = mongoose.model("Tracks", trackSchema);
-    Track.find({}).sort({'ownerGamerCode': 1}).exec(function(err, data){
+    Track.find({}).sort({'createdAt': -1, 'ownerGamerCode': 1}).exec(function(err, data){
         if(err){
             return common.send(res, 400, '', err);
         }

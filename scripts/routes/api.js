@@ -28,8 +28,8 @@ router.get("/message/all", message.all);
 
 router.post("/election/vote", election.vote);
 router.get("/election/result", election.result);
-router.post("/election/setElectionPeroid", election.setPeroid);
-router.get("/election/getElectionPeroid", election.getPeroid);
+router.post("/election/setElectionPeriod", election.setPeriod);
+router.get("/election/getElectionPeriod", election.getPeriod);
 
 router.post("/auction/bid", auction.bid);
 router.post("/auction/post", auction.post);

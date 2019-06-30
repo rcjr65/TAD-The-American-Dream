@@ -10,7 +10,7 @@ export const defaultState = {
     lastWinningNumber: [0, 0, 0, 0, 0, 0],
     jackpot: null,
     ticketList: [],
-    scratcherNumbers: [],
+    scratcherNumbers: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     scratcherList: [],
     error: null,
 };
