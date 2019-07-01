@@ -10,3 +10,10 @@
     color: #ffffff;
     margin-right: 20px;
 }
+.btnModal {
+    margin-top: 20px;
+    color: black;
+    padding: 8px 20px;
+    border-radius: 5px;
+    background-color: white;
+}

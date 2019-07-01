@@ -2,6 +2,7 @@
 export const ELECTION_ERROR = 'ELECTION_ERROR';
 export const ELECTION_SET_PEROID = 'ELECTION_SET_PEROID';
 export const ELECTION_GET_DATA = 'ELECTION_GET_DATA';
+export const ELECTION_EDIT_VOTE = 'ELECTION_EDIT_VOTE';
 
 import {Backend_EndPoint} from '../constants';
 import { ApiProvider } from '../ApiProvider';
@@ -44,6 +45,26 @@ export function setPeriod(params) {
                 payload: {
                     startDate: params.startTime,
                     endDate: params.endTime,
+                }
+            });
+        } catch (error) {
+            dispatch({
+                type: ELECTION_ERROR,
+                payload: error
+            });
+        };
+    };
+}
+
+export function editVote(params) {
+    return async (dispatch, getState) => {
+        try {
+            await ApiProvider(Backend_EndPoint + 'api/election/edit', 'POST', params);
+            var electionResult = await ApiProvider(Backend_EndPoint + 'api/election/result', 'GET', null);
+            dispatch({
+                type: ELECTION_EDIT_VOTE,
+                payload: {
+                    electionResult: electionResult.payload,
                 }
             });
         } catch (error) {

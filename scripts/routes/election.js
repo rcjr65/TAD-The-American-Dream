@@ -4,11 +4,13 @@ var mongoose = require('mongoose');
 
 /*** models ***/
 var voteSchema = require('../models/votes').voteSchema;
+var voteResultSchema = require('../models/voteResult').voteResultSchema;
 var governorSchema = require('../models/governors').governorSchema;
 var electionSchema = require('../models/elections').electionSchema;
 
 exports.vote = function(req, res) {
     var Votes = mongoose.model("Votes", voteSchema);
+    var VoteResult = mongoose.model("VoteResult", voteResultSchema);
 
     if (req.body.userName == undefined) {
         return common.send(res, 401, '', 'Username is undefined');
@@ -40,7 +42,26 @@ exports.vote = function(req, res) {
                 });
                 await model.save();
                 
-                return common.send(res, 200, '', 'Success');
+                VoteResult.findOne({ candidacyCode: req.body.candidacyCode }, async function ( err, _voteResult){
+                    if(err){
+                        return common.send(res, 400, '', err);
+                    }
+                    else{
+                        if (_voteResult == undefined || _voteResult == null) {
+                            var _model = new VoteResult({
+                                candidacyCode: req.body.candidacyCode,
+                                candidacyName: req.body.candidacyName,
+                                votes: 1
+                            });
+                            await _model.save();
+                        }
+                        else {
+                            _voteResult.votes = parseInt(_voteResult.votes) + 1;
+                            await _voteResult.save();
+                        }
+                        return common.send(res, 200, '', 'Success');
+                    }
+                })              
             } else {
                 return common.send(res, 300, '', 'Already exists.');
             }
@@ -49,31 +70,42 @@ exports.vote = function(req, res) {
 }
 
 exports.result = function(req, res) {
-    var Votes = mongoose.model("Votes", voteSchema);
-    
-    Votes.aggregate([
-        { $group : { 
-                "_id" : "$candidacyCode",
-                "count": { $sum: 1 },
-                "data" : {"$first" : "$$ROOT"}
-            }
-        },
-        { $sort : {"count" : -1} },
-        { $limit: 70 },
-        { $project : { "candidacyCode" : "$_id", "candidacyName":"$data.candidacyName", "numbersOfVotes":"$count" } }
-    ], function(err, data){
+
+    var VoteResult = mongoose.model("VoteResult", voteResultSchema);
+    VoteResult.find({"votes":{$ne:0}}).sort({'votes': -1}).exec(function(err, data){
         if(err){
             return common.send(res, 400, '', err);
         }
         else{
-            if(data.length > 0){
-                return common.send(res, 200, data, 'Success'); 
-            }
-            else{
-                return common.send(res, 200, [], 'Empty Data'); 
-            }                
-        }        
-    })
+            return common.send(res, 200, data, 'success');
+        }
+    });
+    // var Votes = mongoose.model("Votes", voteSchema);
+    
+    // Votes.aggregate([
+    //     { $group : { 
+    //             "_id" : "$candidacyCode",
+    //             "count": { $sum: 1 },
+    //             "data" : {"$first" : "$$ROOT"}
+    //         }
+    //     },
+    //     { $sort : {"count" : -1} },
+    //     { $limit: 70 },
+    //     { $project : { "candidacyCode" : "$_id", "candidacyName":"$data.candidacyName", "numbersOfVotes":"$count" } }
+    // ], function(err, data){
+    //     if(err){
+    //         return common.send(res, 400, '', err);
+    //     }
+    //     else{
+    //         if(data.length > 0){
+                
+    //             return common.send(res, 200, data, 'Success'); 
+    //         }
+    //         else{
+    //             return common.send(res, 200, [], 'Empty Data'); 
+    //         }
+    //     }
+    // })
 }
 
 exports.setPeriod = function(req, res){
@@ -130,4 +162,33 @@ exports.getPeriod = function(req, res){
             }
         }
     });
+}
+
+exports.edit = function(req, res) {
+
+    var VoteResult = mongoose.model("VoteResult", voteResultSchema);
+    
+    if (req.body.votes == undefined) {
+        return common.send(res, 401, '', 'Vote Number is undefined');
+    }
+
+    if (req.body.candidacyCode == undefined) {
+        return common.send(res, 401, '', 'candidacyCode is undefined');
+    }
+
+    VoteResult.findOne({ candidacyCode: req.body.candidacyCode }, async function ( err, _voteResult){
+        if(err){
+            return common.send(res, 400, '', err);
+        }
+        else{
+            if (_voteResult == undefined || _voteResult == null) {
+                return common.send(res, 300, '', 'Undefined');
+            }
+            else {
+                _voteResult.votes = req.body.votes;
+                await _voteResult.save();
+            }
+            return common.send(res, 200, '', 'Success');
+        }
+    })
 }

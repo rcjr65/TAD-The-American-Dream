@@ -2,6 +2,7 @@ import {
     ELECTION_ERROR,
     ELECTION_SET_PEROID,
     ELECTION_GET_DATA,
+    ELECTION_EDIT_VOTE,
     defaultState 
   } from '../actions/election';
   
@@ -24,6 +25,11 @@ import {
                 ...state,
                 startDate: action.payload.startDate,
                 endDate: action.payload.endDate,
+                electionResult: action.payload.electionResult,
+            };
+        case ELECTION_EDIT_VOTE:
+            return {
+                ...state,
                 electionResult: action.payload.electionResult,
             };
         default:

@@ -3,8 +3,9 @@ import { connect } from 'react-redux';
 import moment from 'moment';
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
+import ReactModal from 'react-modal';
 
-import {setPeriod, loadData} from '../../actions/election';
+import {setPeriod, loadData, editVote} from '../../actions/election';
 import ElectionTable from '../../components/electionTable';
 
 import '../../css/oswald.css';
@@ -13,6 +14,23 @@ import '../../css/pure-min.css';
 import '../../App.css';
 import './style.css';
 
+const customStyles = {
+  overlay: { 
+    backgroundColor: 'rgba(0,0,0,0.2)'
+  },
+  content : {
+    display: 'flex',
+    flexDirection: 'column',
+    color: 'white', 
+    backgroundColor: 'rgba(0,0,0,0.8)', 
+    margin: '15% calc(15% - 60px)', 
+    width: '50%', 
+    height: '35%', 
+    border: 'none', 
+    borderRadius: '5px', 
+    alignItems: 'center', 
+  }
+};
 class Election extends Component {
     
   constructor(props) {
@@ -20,6 +38,9 @@ class Election extends Component {
     this.state = {
       startDate: new Date(),
       endDate: new Date(),
+      isOpen: false,
+      votes: 0,
+      candidacyCode: '',
     };
   }
 
@@ -55,6 +76,32 @@ class Election extends Component {
       endTime: this.state.endDate
     }
     this.props.setPeriod(params);
+  }
+
+  onAction = (e, params) => {
+    if(e == 0) { // edit
+      this.setState({votes: params.votes, isOpen: true, candidacyCode: params.candidacyCode})
+    }
+    else { // remove
+      var params = {
+        votes: 0,
+        candidacyCode: this.state.candidacyCode
+      }
+      this.props.editVote(params)
+    }
+  }
+
+  handleCloseModal = () => {
+    this.setState({isOpen: false})
+  }
+
+  btnChange = () => {
+    this.setState({isOpen: false})
+    var params = {
+      votes: this.state.votes,
+      candidacyCode: this.state.candidacyCode
+    }
+    this.props.editVote(params)
   }
 
   render() {
@@ -96,8 +143,23 @@ class Election extends Component {
             </div>
             <div className='box col-md-8'>
                 <h2>ELECTION RESULT</h2>
-                <ElectionTable electionResult={this.props.electionResult} />
+                <ElectionTable electionResult={this.props.electionResult} onAction={(e, params)=>this.onAction(e, params)} />
             </div>
+            <ReactModal
+              isOpen={this.state.isOpen}
+              onRequestClose={this.handleCloseModal}
+              contentLabel='Controls'
+              style={customStyles}
+              ariaHideApp={false}
+            >
+            <h2>Votes</h2>
+            <input
+              onChange={(event)=>this.setState({ votes: event.target.value})}
+              value={this.state.votes}
+              style={{ backgroundColor: 'grey', border: 'none', borderRadius: '4px', padding: 10, width:'50%' }} />
+            <br />
+            <button className='btnModal' onClick={this.btnChange}>SET</button>
+          </ReactModal>
         </div>
       </div>
     );
@@ -106,7 +168,8 @@ class Election extends Component {
 
 const mapDispatchToProps = {
   setPeriod,
-  loadData
+  loadData,
+  editVote
 };
 
 const mapStateToProps = ({election}) => ({

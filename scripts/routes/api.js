@@ -27,6 +27,7 @@ router.post("/governor/updateTax", governor.updateTax);
 router.get("/message/all", message.all);
 
 router.post("/election/vote", election.vote);
+router.post("/election/edit", election.edit);
 router.get("/election/result", election.result);
 router.post("/election/setElectionPeriod", election.setPeriod);
 router.get("/election/getElectionPeriod", election.getPeriod);
