@@ -6,6 +6,10 @@ var auctionSchema = require('../models/auction').auctionSchema;
 exports.post =  function(req, res) {
     var Auction = mongoose.model("Auction", auctionSchema);
     
+    if (req.body.itemId == undefined) {
+        return common.send(res, 401, '', 'itemId is undefined');
+    }
+
     if (req.body.itemName == undefined) {
         return common.send(res, 401, '', 'itemName is undefined');
     }
@@ -29,9 +33,12 @@ exports.post =  function(req, res) {
     var createAt = Math.round(new Date().getTime()/1000);
     var expiry = parseInt(createAt, 10) + parseInt(24*60*60, 10);
     var newAuction = new Auction({
+        itemId: req.body.itemId,
         itemName: req.body.itemName,
         itemCategory: req.body.itemCategory,
         minPrice: req.body.minPrice,
+        bidPrice: 0,
+        buyPrice: req.body.buyPrice == undefined ? 0 : req.body.buyPrice,
         ownerGamerCode: req.body.ownerGamerCode,
         ownerName: req.body.ownerName,
         createdAt: createAt,
@@ -50,7 +57,7 @@ exports.post =  function(req, res) {
 
 exports.get =  function(req, res) {
     var Auction = mongoose.model('Auction', auctionSchema);
-    Auction.find({}).sort({'createdAt': 1}).exec(function(err, data){
+    Auction.find({bidPrice:0}).sort({'createdAt': 1}).exec(function(err, data){
         if(err){
             return common.send(res, 400, '', err);
         }
@@ -62,6 +69,15 @@ exports.get =  function(req, res) {
 
 exports.result =  function(req, res) {
     var Auction = mongoose.model('Auction', auctionSchema);
+    Auction.find({bidPrice:{$ne: 0}}, ['itemId', 'itemName', 'itemCategory', 'ownerGamerCode', 'ownerName', 'biderGamerCode', 'biderName', 'minPrice', 'bidPrice', 'buyPrice']).sort({'createdAt': 1}).exec(function(err, data){
+        if(err){
+            return common.send(res, 400, '', err);
+        }
+        else{
+            return common.send(res, 200, data, 'success');
+        }
+    }); 
+    /**
     Auction.aggregate([
         {
             $match: {
@@ -92,7 +108,7 @@ exports.result =  function(req, res) {
         else{
             return common.send(res, 200, data, 'success');
         }
-    })    
+    })  **/
 }
 
 exports.bid =  function(req, res) {
@@ -114,7 +130,7 @@ exports.bid =  function(req, res) {
         return common.send(res, 401, '', 'auctionId is undefined');
     }
 
-    Auction.findOne({_id : req.body.auctionId}, ['itemName', 'itemCategory', 'expiry', 'ownerGamerCode', 'ownerName', 'minPrice']).exec(function(err, data){
+    Auction.findOne({_id : req.body.auctionId}, ['itemId', 'itemName', 'itemCategory', 'expiry', 'ownerGamerCode', 'ownerName', 'minPrice', 'buyPrice']).exec(function(err, data){
         if(err){
             return common.send(res, 400, '', err);
         }
@@ -126,25 +142,55 @@ exports.bid =  function(req, res) {
                 var createAt = Math.round(new Date().getTime()/1000);
                 var expiredTime = parseInt(data.expiry, 10);
                 if( createAt < expiredTime){
-                    var newAuction = new Auction({
-                        itemName: data.itemName,
-                        itemCategory: data.itemCategory,
-                        bidPrice: req.body.bidPrice,
-                        biderName: req.body.biderName,
-                        biderGamerCode: req.body.biderGamerCode,
-                        biderItemId: req.body.auctionId,
-                        ownerGamerCode: data.ownerGamerCode,
-                        ownerName: data.ownerName,
-                        minPrice: data.minPrice,
-                        expiry: data.expiry,
-                    });
-    
-                    newAuction.save(function(err, result){
+                    Auction.findOne({biderItemId : req.body.auctionId}).exec( function(err, topBidderData){
                         if(err){
                             return common.send(res, 400, '', err);
                         }
                         else{
-                            return common.send(res, 200, '', 'success');
+                            if (topBidderData == undefined || topBidderData == null) {
+                                var newAuction = new Auction({
+                                    itemId: data.itemId,
+                                    itemName: data.itemName,
+                                    itemCategory: data.itemCategory,
+                                    bidPrice: req.body.bidPrice,
+                                    biderName: req.body.biderName,
+                                    buyPrice: data.buyPrice,
+                                    biderGamerCode: req.body.biderGamerCode,
+                                    biderItemId: req.body.auctionId,
+                                    ownerGamerCode: data.ownerGamerCode,
+                                    ownerName: data.ownerName,
+                                    minPrice: data.minPrice,
+                                    expiry: data.expiry,
+                                });
+                
+                                newAuction.save(function(err, result){
+                                    if(err){
+                                        return common.send(res, 400, '', err);
+                                    }
+                                    else{
+                                        return common.send(res, 200, '', 'success');
+                                    }
+                                })
+                            }
+                            else{
+                                if(req.body.bidPrice > topBidderData.bidPrice){
+                                    topBidderData.bidPrice = req.body.bidPrice;
+                                    topBidderData.biderGamerCode = req.body.biderGamerCode;
+                                    topBidderData.biderName = req.body.biderName;
+
+                                    topBidderData.save(function(err, result){
+                                        if(err){
+                                            return common.send(res, 400, '', err);
+                                        }
+                                        else{
+                                            return common.send(res, 200, '', 'success');
+                                        }
+                                    })
+                                }
+                                else{
+                                    return common.send(res, 200, '', 'success');
+                                }                                
+                            }
                         }
                     })
                 }

@@ -3,6 +3,7 @@ var mongoose = require('mongoose');
 
 var itemSchema = require('../models/items').itemSchema;
 var trackSchema = require('../models/tracks').trackSchema;
+var auctionSchema = require('../models/auction').auctionSchema;
 
 exports.post =  function(req, res) {
     var Item = mongoose.model("Items", itemSchema);
@@ -87,6 +88,7 @@ exports.get =  function(req, res) {
 exports.buy =  function(req, res) {
     var Item = mongoose.model("Items", itemSchema);
     var Track = mongoose.model("Tracks", trackSchema);
+    var Auction = mongoose.model("Auction", auctionSchema);
 
     if (req.body.itemId == undefined) {
         return common.send(res, 401, '', 'item id is undefined');
@@ -118,6 +120,10 @@ exports.buy =  function(req, res) {
     
     if (req.body.isTSR == undefined) {
         return common.send(res, 401, '', 'isTSR is undefined');
+    }
+    
+    if (req.body.isAuctionItem == undefined) { // 1: auction item, 0: item
+        return common.send(res, 401, '', 'isAuctionItem is undefined');
     }
 
     var createAt = Math.round(new Date().getTime()/1000);
@@ -156,7 +162,34 @@ exports.buy =  function(req, res) {
                                 return common.send(res, 400, '', err);
                             }
                             else{
-                                return common.send(res, 200, '', 'success');
+                                if(req.body.isAuctionItem == 1){
+                                    Auction.findOne({buyPrice : {$ne: 0}, itemId: req.body.itemId}).exec(function(auctionErr, auctionData){
+                                        if(auctionErr){
+                                            return common.send(res, 400, '', auctionErr);
+                                        }
+                                        else{
+                                            if (auctionData == undefined || auctionData == null) {
+                                                return common.send(res, 300, '', 'No exists.');
+                                            }
+                                            else{
+                                                auctionData.bidPrice = req.body.price;
+                                                auctionData.biderName = req.body.ownerName;
+                                                auctionData.biderGamerCode = req.body.ownerGamerCode;
+                                                auctionData.save(function(err, result){
+                                                    if(err){
+                                                        return common.send(res, 400, '', err);
+                                                    }
+                                                    else{
+                                                        return common.send(res, 200, '', 'success');
+                                                    }
+                                                })
+                                            }
+                                        }
+                                    });
+                                }
+                                else{
+                                    return common.send(res, 200, '', 'success');
+                                }
                             }
                         });
                     }

@@ -4,9 +4,11 @@ var mongoose = restful.mongoose;
 
 var auctionSchema = new mongoose.Schema({
   auctionId: mongoose.Schema.Types.ObjectId,
+  itemId: String,
   itemName: String,
   itemCategory: String,
   minPrice: {type: Number, default: 0},
+  buyPrice: {type: Number, default: 0},
   bidPrice: {type: Number, default: 0},
   winnerPrice: {type: Number, default: 0},
   isBuy: {type: Number, default: 0}, // 0: default, 1: bought

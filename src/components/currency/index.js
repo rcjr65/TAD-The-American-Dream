@@ -11,6 +11,7 @@ import '../../css/oswald.css';
 import '../../css/open-sans.css';
 import '../../css/pure-min.css';
 import '../../App.css';
+import './style.css';
 
 export default class Currency extends Component {
   constructor(props) {
@@ -34,14 +35,17 @@ export default class Currency extends Component {
                     {
                         Header: 'CURRENCY',
                         accessor: 'currency',
+                        width: '40%'
                     },
                     {
                         Header: 'PRICE',
-                        accessor: 'price'
+                        accessor: 'price',
+                        width: '25%'
                     },
                     {
                         Header: 'ACTION',
-                        Cell: this.actionGovCell
+                        Cell: this.actionGovCell,
+                        width: '35%'
                     },
                 ]}
                 defaultPageSize={5}
