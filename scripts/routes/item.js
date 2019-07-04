@@ -155,7 +155,7 @@ exports.buy =  function(req, res) {
                     }
                     else{
                         
-                        data.stock = parseInt(data.quantity) - parseInt(req.body.quantity);
+                        data.stock = parseInt(data.stock) - parseInt(req.body.quantity);
         
                         data.save(function(err, result){
                             if(err){
