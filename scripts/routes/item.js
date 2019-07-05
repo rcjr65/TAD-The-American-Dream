@@ -57,8 +57,8 @@ exports.post =  function(req, res) {
             }
             else{
                 data.price = req.body.price;
-                data.quantity = req.body.quantity;
-                data.stock = req.body.quantity;
+                data.quantity = parseInt(data.quantity) + parseInt(req.body.quantity);
+                data.stock = parseInt(data.stock) + parseInt(req.body.quantity);
 
                 data.save(function(err, result){
                     if(err){
