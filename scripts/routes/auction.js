@@ -201,3 +201,21 @@ exports.bid =  function(req, res) {
         }
     })    
 };
+
+exports.delete =  function(req, res) {
+    var Auction = mongoose.model("Auction", auctionSchema);
+    
+    if (req.body.auctionId == undefined) {
+        return common.send(res, 401, '', 'auctionId is undefined');
+    }
+
+    Auction.deleteOne({ _id: req.body.auctionId, bidPrice:0 }, function (err) {
+        if(err){
+            return common.send(res, 400, '', err);
+        }
+        else{
+            return common.send(res, 200, '', 'success');
+        }
+    });
+
+}
