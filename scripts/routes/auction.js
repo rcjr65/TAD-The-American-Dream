@@ -177,6 +177,7 @@ exports.bid =  function(req, res) {
                                     topBidderData.bidPrice = req.body.bidPrice;
                                     topBidderData.biderGamerCode = req.body.biderGamerCode;
                                     topBidderData.biderName = req.body.biderName;
+                                    topBidderData.biderItemId = req.body.auctionId;
 
                                     topBidderData.save(function(err, result){
                                         if(err){
@@ -209,7 +210,7 @@ exports.delete =  function(req, res) {
         return common.send(res, 401, '', 'auctionId is undefined');
     }
 
-    Auction.deleteOne({ _id: req.body.auctionId, bidPrice:0 }, function (err) {
+    Auction.deleteOne({ $or:[ {_id: req.body.auctionId}, {biderItemId: req.body.auctionId}]}, function (err) {
         if(err){
             return common.send(res, 400, '', err);
         }
