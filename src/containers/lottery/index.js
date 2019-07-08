@@ -74,6 +74,7 @@ class Lottery extends Component {
       return alert("Please fill all winning numbers.");
 
     this.props.setScratcherNumber(this.state.scratcherNumbers);
+    alert('The numbers were set successfully')
   }
 
   setNumbers = () => {
