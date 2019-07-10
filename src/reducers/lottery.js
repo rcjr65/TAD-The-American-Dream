@@ -17,6 +17,7 @@ import {
                 scratcherList: action.payload.scratcherList
             };  
         case LOTTERY_UPDATE_WINNER:
+            alert('Success')
             return {
                 ...state,
                 lastWinningNumber: action.payload.lastWinningNumber,

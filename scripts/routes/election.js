@@ -111,6 +111,8 @@ exports.result = function(req, res) {
 exports.setPeriod = function(req, res){
     var Elections = mongoose.model("Elections", electionSchema);
     var Votes = mongoose.model("Votes", voteSchema);
+    var VoteResult = mongoose.model("VoteResult", voteResultSchema);
+
     if (req.body.startTime == undefined || req.body.startTime == '') {
         return common.send(res, 401, '', 'startTime is undefined');
     }
@@ -119,29 +121,36 @@ exports.setPeriod = function(req, res){
         return common.send(res, 401, '', 'endTime is undefined');
     }
     
-    Elections.remove({}, function(err){
+    Elections.deleteMany({}, function(err){
         if(err){
             return common.send(res, 400, '', err);
         }
         else{
-            // Votes.remove({}, function(err){
-            //     if(err){
-            //         return common.send(res, 400, '', err);
-            //     }
-            //     else{
-                    var _temp = {};
-                    _temp.startTime = Math.floor(new Date(req.body.startTime).getTime()/1000);
-                    _temp.endTime = Math.floor(new Date(req.body.endTime).getTime()/1000);
-                    
-                    Elections.insertMany(_temp, function (err, data) {
-                        if (err){ 
+            Votes.deleteMany({}, function(err){
+                if(err){
+                    return common.send(res, 400, '', err);
+                }
+                else{
+                    VoteResult.deleteMany({}, function(err){
+                        if(err){
                             return common.send(res, 400, '', err);
-                        } else {                    
-                            return common.send(res, 200, data, 'Success');
                         }
-                    });
-            //     }
-            // });
+                        else{
+                            var _temp = {};
+                            _temp.startTime = Math.floor(new Date(req.body.startTime).getTime()/1000);
+                            _temp.endTime = Math.floor(new Date(req.body.endTime).getTime()/1000);
+                            
+                            Elections.insertMany(_temp, function (err, data) {
+                                if (err){ 
+                                    return common.send(res, 400, '', err);
+                                } else {                    
+                                    return common.send(res, 200, data, 'Success');
+                                }
+                            });
+                        }
+                    })
+                }
+            });
         }
     });
 }

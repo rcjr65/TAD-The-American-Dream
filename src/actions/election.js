@@ -40,11 +40,13 @@ export function setPeriod(params) {
     return async (dispatch, getState) => {
         try {
             var electionDate = await ApiProvider(Backend_EndPoint + 'api/election/setElectionPeriod', 'POST', params);
+            var electionResult = await ApiProvider(Backend_EndPoint + 'api/election/result', 'GET', null);
             dispatch({
                 type: ELECTION_SET_PEROID,
                 payload: {
                     startDate: params.startTime,
                     endDate: params.endTime,
+                    electionResult: electionResult.payload,
                 }
             });
         } catch (error) {

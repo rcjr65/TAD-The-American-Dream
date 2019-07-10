@@ -27,10 +27,10 @@ export function loadWinningJackpotTicketScratcher() {
         dispatch({
             type: LOTTERY_W_J_T_S,
             payload: {
-                lastWinningNumber: lastWinningNumber.payload.winingNumbers,
+                lastWinningNumber: lastWinningNumber.payload?lastWinningNumber.payload.winingNumbers:[0, 0, 0, 0, 0, 0],
                 jackpot: jackpot.payload[0],
                 ticketList: ticketList.payload,
-                scratcherNumbers: scratcherNumbers.payload.winingNumbers,
+                scratcherNumbers: scratcherNumbers.payload?scratcherNumbers.payload.winingNumbers:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 scratcherList: scratcherList.payload,
             }
         });
@@ -67,6 +67,7 @@ export function saveJackPot(id, value) {
     return async (dispatch, getState) => {
         try {
             await ApiProvider(Backend_EndPoint + "setJackpot", "POST", {id, value});
+            alert('Success');
         } catch (error) {
             dispatch({
                 type: LOTTERY_ERROR,
@@ -81,6 +82,7 @@ export function setScratcherNumber(winingNumbers) {
     return async (dispatch, getState) => {
         try {
             await ApiProvider(Backend_EndPoint + "api/lottery/setScratcherNumber", "POST", {winingNumbers});
+            alert('The numbers were set successfully');
         } catch (error) {
             dispatch({
                 type: LOTTERY_ERROR,

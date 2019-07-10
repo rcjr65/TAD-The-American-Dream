@@ -15,10 +15,12 @@ import {
                 error: action.payload
             };
         case ELECTION_SET_PEROID:
+            alert('Success');
             return {
                 ...state,
                 startDate: action.payload.startDate,
-                endDate: action.payload.endDate
+                endDate: action.payload.endDate,
+                electionResult: action.payload.electionResult
             };
         case ELECTION_GET_DATA:
             return {
@@ -28,6 +30,7 @@ import {
                 electionResult: action.payload.electionResult,
             };
         case ELECTION_EDIT_VOTE:
+            alert('Success');
             return {
                 ...state,
                 electionResult: action.payload.electionResult,

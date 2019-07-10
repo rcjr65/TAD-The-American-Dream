@@ -86,12 +86,13 @@ class Home extends Component {
       console.log("state => ", this.state)
       var params = {
         id: this.state.govId,
-        userCode: this.state.userCode,
+        userCode: this.state.userCode.toUpperCase(),
         userName: this.state.userName,
         govTax: this.state.govTax,
         tadTax: this.state.tadTax,
         isNew: this.state.isNew
       }
+      
       if( (this.state.userData.userCode == this.state.userCode && this.state.isNew == true) || (this.state.userData.userName == this.state.userName && this.state.isNew == false)){
         this.props.updateGovTax(params);
       }

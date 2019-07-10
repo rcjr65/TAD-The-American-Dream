@@ -73,8 +73,7 @@ class Lottery extends Component {
     if(this.state.scratcherNumbers.length != 25)
       return alert("Please fill all winning numbers.");
 
-    this.props.setScratcherNumber(this.state.scratcherNumbers);
-    alert('The numbers were set successfully')
+    this.props.setScratcherNumber(this.state.scratcherNumbers);    
   }
 
   setNumbers = () => {
@@ -82,7 +81,12 @@ class Lottery extends Component {
       for (var x = 0; x < 6; x++) {
         arr[x] = parseInt(this.state.winningNumbers[x]);
       }
-      this.props.setWinnerNumber(arr, this.state.payout);
+      if(this.props.ticketList.length == 0){
+        alert("You can't set winning numbers since there is no tickets.")
+      }
+      else{
+        this.props.setWinnerNumber(arr, this.state.payout);
+      }
   }
 
   editJackPot = () =>{

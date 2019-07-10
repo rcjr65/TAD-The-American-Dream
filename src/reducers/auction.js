@@ -27,6 +27,7 @@ import {
                 auctionList: action.payload.auctionList,
             };
         case AUCTION_LOAD_ITEM:
+            alert('Success')
             return {
                 ...state,
                 itemList: action.payload.itemList
