@@ -23,7 +23,7 @@ class Lottery extends Component {
         winningNumbers: [0, 0, 0, 0, 0, 0],
         isEditJackPot: false,
         jackpot: 0,
-        scratcherNumbers: [],
+        scratcherNumbers: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         payout: 0,
     }
   }
