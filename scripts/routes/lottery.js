@@ -126,7 +126,18 @@ exports.lastWinningNumber =  function(req, res) {
             return common.send(res, 400, '', err);
         }
         else{
-            return common.send(res, 200, data, 'success');
+            if(data ==  undefined || data == null) {
+                var param = {
+                    winingNumbers: [0, 0, 0, 0, 0, 0],
+                    _id: '',
+                    payout: 0,
+                    createdAt: ''
+                }
+                return common.send(res, 200, param, 'success');
+            }
+            else{
+                return common.send(res, 200, data, 'success');
+            }
         }
     })
 }
@@ -191,7 +202,15 @@ exports.getScratcherNumber =  function(req, res) {
             return common.send(res, 400, '', err);
         }
         else{
-            return common.send(res, 200, data, 'success');
+            if(data ==  undefined || data == null) {
+                var param = {
+                    winingNumbers: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                }
+                return common.send(res, 200, param, 'success');
+            }
+            else{
+                return common.send(res, 200, data, 'success');
+            }            
         }
     })
 }
