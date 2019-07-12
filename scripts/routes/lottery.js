@@ -97,14 +97,14 @@ exports.setWinnerNumber =  function(req, res) {
         return common.send(res, 401, '', 'winningNumbers is undefined');
     }
     
-    if (req.body.payout == undefined) {
-        return common.send(res, 401, '', 'payout is undefined');
+    if (req.body.winnerData == undefined) {
+        return common.send(res, 401, '', 'winnerData is undefined');
     }
 
     var createAt = Math.round(new Date().getTime()/1000);
     var newTicket = new Ticket({
         winingNumbers: req.body.winningNumbers,
-        payout: req.body.payout,
+        winnerData: req.body.winnerData,
         createdAt: createAt
     });
 
@@ -121,7 +121,7 @@ exports.setWinnerNumber =  function(req, res) {
 exports.lastWinningNumber =  function(req, res) {
     var Ticket = mongoose.model("Ticket", ticketSchema);
 
-    Ticket.findOne({"winingNumbers": {$ne:[]}}, ['winingNumbers', 'payout', 'createdAt']).sort({'createdAt': -1}).exec(function(err, data){
+    Ticket.findOne({"winingNumbers": {$ne:[]}}, ['winingNumbers', 'winnerData', 'createdAt']).sort({'createdAt': -1}).exec(function(err, data){
         if(err){
             return common.send(res, 400, '', err);
         }
@@ -130,7 +130,7 @@ exports.lastWinningNumber =  function(req, res) {
                 var param = {
                     winingNumbers: [0, 0, 0, 0, 0, 0],
                     _id: '',
-                    payout: 0,
+                    winnerData: [],
                     createdAt: ''
                 }
                 return common.send(res, 200, param, 'success');

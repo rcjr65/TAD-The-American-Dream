@@ -25,6 +25,7 @@ class Lottery extends Component {
         jackpot: 0,
         scratcherNumbers: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         payout: 0,
+        lottoData: []
     }
   }
   componentDidMount() {
@@ -85,7 +86,11 @@ class Lottery extends Component {
         alert("You can't set winning numbers since there is no tickets.")
       }
       else{
-        this.props.setWinnerNumber(arr, this.state.payout);
+        var params = {
+            winningNumbers: arr,
+            winnerData: this.state.lottoData
+        }
+        this.props.setWinnerNumber(params);
       }
   }
 
@@ -122,32 +127,45 @@ class Lottery extends Component {
   calcPayout = (winningNumbers) => {
     var isLevel = 0;
     var payout = 0;
+    var lottoData = [];
+
     this.props.ticketList.forEach(ticket => {
       let matchingCount = this.getMatchingElementCount(ticket.numbers, winningNumbers)
 
       if(matchingCount == 6){
-        isLevel = 6;
+        var lv6 = {}
+        lv6 = {
+            userCode: ticket.userCode,
+            payout: parseInt(this.props.jackpot.value, 10)
+        }
+        
+        lottoData.push(lv6)
       }
       else if (matchingCount == 5){
-        isLevel = 5;
+        var lv5 = {} 
+        lv5 = {
+            userCode: ticket.userCode,
+            payout: parseInt(this.props.jackpot.value, 10) * 0.1
+        }
+        
+        lottoData.push(lv5)
       }
-      else if( matchingCount == 4)
-        isLevel = 4;
-
+      else if( matchingCount == 4){
+        var lv4 = {} 
+        lv4 = {
+            userCode: ticket.userCode,
+            payout: parseInt(this.props.jackpot.value, 10) * 0.01
+        }
+        
+        lottoData.push(lv4)
+      }
     });
 
-    if(isLevel == 6){
-      payout = (parseInt(this.props.jackpot.value, 10)).toFixed(2);
-    }
-    else if (isLevel == 5){
-      payout = (parseInt(this.props.jackpot.value, 10) * 0.1 ).toFixed(2);
-    }
-    else if(isLevel == 4){
-      payout = (parseInt(this.props.jackpot.value, 10) * 0.01).toFixed(2);
-    }
-
-    this.setState({payout});
-    return payout;
+    lottoData.forEach(element => {
+        payout = parseInt(payout, 10) + parseInt(element.payout, 10)
+    });
+        
+    this.setState({lottoData, payout: payout.toFixed(2)})
   }
 
   randomizeWinner = () => {
@@ -177,7 +195,7 @@ class Lottery extends Component {
   }
 
   render() {
-        
+    // console.log('lottoData => ', this.state.lottoData)
     return (
       <div className='containers'>
         <div className='lottWrapper'>
