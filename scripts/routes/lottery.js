@@ -5,7 +5,7 @@ var ticketSchema = require('../models/tickets').ticketSchema;
 var scratcherSchema = require('../models/scratchers').scratcherSchema;
 
 exports.sendPickData =  function(req, res) {
-    var Ticket = mongoose.model("Ticket", ticketSchema);
+    var Ticket = mongoose.model('Ticket', ticketSchema);
 
     if (req.body.userName == undefined) {
         return common.send(res, 401, '', 'userName is undefined');
@@ -30,7 +30,7 @@ exports.sendPickData =  function(req, res) {
     console.log({curr})
     console.log(curr.getTime())
     
-    Ticket.find({"createdAt":{$lt:firstDayOfWeek}}, ['_id'],function(err, data){
+    Ticket.find({'createdAt':{$lt:firstDayOfWeek}}, ['_id'],function(err, data){
         if(err){
             return common.send(res, 400, '', err);
         }
@@ -78,9 +78,9 @@ function saveTicket(Ticket, req, res){
 
 exports.getPickData =  function(req, res) {
 
-    var Ticket = mongoose.model("Ticket", ticketSchema);
+    var Ticket = mongoose.model('Ticket', ticketSchema);
 
-    Ticket.find({"winingNumbers":[]}, ['userName', 'userCode', 'numbers'],function(err, data){
+    Ticket.find({'winingNumbers':[]}, ['userName', 'userCode', 'numbers'],function(err, data){
         if(err){
             return common.send(res, 400, '', err);
         }
@@ -91,7 +91,7 @@ exports.getPickData =  function(req, res) {
 }
 
 exports.setWinnerNumber =  function(req, res) {
-    var Ticket = mongoose.model("Ticket", ticketSchema);
+    var Ticket = mongoose.model('Ticket', ticketSchema);
     
     if (req.body.winningNumbers == undefined) {
         return common.send(res, 401, '', 'winningNumbers is undefined');
@@ -119,9 +119,9 @@ exports.setWinnerNumber =  function(req, res) {
 }
 
 exports.lastWinningNumber =  function(req, res) {
-    var Ticket = mongoose.model("Ticket", ticketSchema);
+    var Ticket = mongoose.model('Ticket', ticketSchema);
 
-    Ticket.findOne({"winingNumbers": {$ne:[]}}, ['winingNumbers', 'winnerData', 'createdAt']).sort({'createdAt': -1}).exec(function(err, data){
+    Ticket.findOne({'winingNumbers': {$ne:[]}}, ['winingNumbers', 'winnerData', 'createdAt']).sort({'createdAt': -1}).exec(function(err, data){
         if(err){
             return common.send(res, 400, '', err);
         }
@@ -143,7 +143,7 @@ exports.lastWinningNumber =  function(req, res) {
 }
 
 exports.setScratcherNumber =  function(req, res) {
-    var Scratcher = mongoose.model("Scratcher", scratcherSchema);
+    var Scratcher = mongoose.model('Scratcher', scratcherSchema);
 
     if (req.body.winingNumbers == undefined) {
         return common.send(res, 401, '', 'winingNumbers is undefined');
@@ -152,74 +152,137 @@ exports.setScratcherNumber =  function(req, res) {
     var createAt = Math.round(new Date().getTime()/1000);
     var newScratcher = new Scratcher({
         winingNumbers: req.body.winingNumbers,
+        originalWiningNumbers: req.body.winingNumbers,
+        isWiningNumber: true,
         createdAt: createAt
     });
 
-    Scratcher.find({"winingNumbers":{$ne:[]}}, ['_id'],function(err, data){
+    // Scratcher.find({'isWiningNumber':true}, ['_id'],function(err, data){
+    //     if(err){
+    //         return common.send(res, 400, '', err);
+    //     }
+    //     else{
+    //         if(data != null && data.length > 0){
+    //             var temp = [];
+    //             data.forEach(e=>{
+    //                 temp.push(e._id);
+    //             })
+    //             Scratcher.deleteMany({ _id: { $in: temp}}, function(err) {
+    //                 if(err){
+    //                     return common.send(res, 400, '', err);
+    //                 }
+    //                 else{
+    //                     newScratcher.save(function(err, result){
+    //                         if(err){
+    //                             return common.send(res, 400, '', err);
+    //                         }
+    //                         else{
+    //                             return common.send(res, 200, result, 'success');
+    //                         }
+    //                     })
+    //                 }
+    //             })
+    //         }
+    //         else{
+    //             newScratcher.save(function(err, result){
+    //                 if(err){
+    //                     return common.send(res, 400, '', err);
+    //                 }
+    //                 else{
+    //                     return common.send(res, 200, result, 'success');
+    //                 }
+    //             })
+    //         }
+    //     }
+    // }) 
+    Scratcher.deleteMany({}, function(err) {
         if(err){
             return common.send(res, 400, '', err);
         }
         else{
-            if(data.length > 0){
-                var temp = [];
-                data.forEach(e=>{
-                    temp.push(e._id);
-                })
-                Scratcher.deleteMany({ _id: { $in: temp}}, function(err) {
-                    if(err){
-                        return common.send(res, 400, '', err);
-                    }
-                    else{
-                        newScratcher.save(function(err, result){
-                            if(err){
-                                return common.send(res, 400, '', err);
-                            }
-                            else{
-                                return common.send(res, 200, result, 'success');
-                            }
-                        })
-                    }
-                })
-            }
-            else{
-                newScratcher.save(function(err, result){
-                    if(err){
-                        return common.send(res, 400, '', err);
-                    }
-                    else{
-                        return common.send(res, 200, result, 'success');
-                    }
-                })
-            }
+            newScratcher.save(function(err, result){
+                if(err){
+                    return common.send(res, 400, '', err);
+                }
+                else{
+                    return common.send(res, 200, result, 'success');
+                }
+            })
         }
-    }) 
+    })
 }
 
 exports.getScratcherNumber =  function(req, res) {
-    var Scratcher = mongoose.model("Scratcher", scratcherSchema);
-    Scratcher.findOne({"winingNumbers": {$ne:[]}}, ['winingNumbers', 'createdAt']).sort({'createdAt': -1}).exec(function(err, data){
+    var Scratcher = mongoose.model('Scratcher', scratcherSchema);
+    Scratcher.findOne({'isWiningNumber': true}).exec(function(err, data){
         if(err){
             return common.send(res, 400, '', err);
         }
         else{
             if(data ==  undefined || data == null) {
                 var param = {
-                    winingNumbers: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    originalWiningNumbers: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                    winingNumbers: [],
+                    winnerCount: 0,
+                    loserCount: 0,
                 }
                 return common.send(res, 200, param, 'success');
             }
             else{
-                return common.send(res, 200, data, 'success');
+                Scratcher.aggregate([
+                    {
+                        $match: {
+                            isWiningNumber: false,
+                        }
+                    },
+                    { $group : { 
+                        '_id' : '$isWiningNumber',
+                        'count': { $sum:  { $cond:[{$eq:['$isWinner', true]}, 1, 0]}},
+                        'count1': { $sum:  { $cond:[{$eq:['$isWinner', false]}, 1, 0]}},
+                        'data' : {'$first' : '$$ROOT'}
+                    }
+                },
+                { $sort : {'count' : -1} },
+                { $project : { 'winnerCount':'$count', 'loserCount':'$count1'} },
+                    
+                ], function(err, result){
+                    if(err){
+                        return common.send(res, 400, '', err);
+                    }
+                    else{
+                        if(result != null && result.length > 0){
+                            var param = {
+                                originalWiningNumbers: data.originalWiningNumbers,
+                                winingNumbers: data.winingNumbers,
+                                winnerCount: result[0].winnerCount,
+                                loserCount: result[0].loserCount,
+                            }
+                            return common.send(res, 200, param, 'success');
+                        }
+                        else{
+                            var param = {
+                                originalWiningNumbers: data.originalWiningNumbers,
+                                winingNumbers: data.winingNumbers,
+                                winnerCount: 0,
+                                loserCount: 0,
+                            }
+                            return common.send(res, 200, param, 'success');
+                        }                
+                    }        
+                })
             }            
         }
     })
 }
 
 exports.sendScratcherWinnerData =  function(req, res) {
-    var Scratcher = mongoose.model("Scratcher", scratcherSchema);
+    
+    var Scratcher = mongoose.model('Scratcher', scratcherSchema);
+    
     if (req.body.userName == undefined) {
         return common.send(res, 401, '', 'userName is undefined');
     }
+    
     if (req.body.userCode == undefined) {
         return common.send(res, 401, '', 'userCode is undefined');
     }
@@ -227,29 +290,69 @@ exports.sendScratcherWinnerData =  function(req, res) {
     if (req.body.winingCost == undefined) {
         return common.send(res, 401, '', 'winingCost is undefined');
     }
+    
+    if (req.body.isWinner == undefined) {
+        return common.send(res, 401, '', 'isWinner is undefined');
+    }
+
+    if(req.body.isWinner == true && (req.body.winingCost == 0 || req.body.winingCost == '' || req.body.winingCost == '0')){
+        return common.send(res, 401, '', "The winning cost can't be 0.");
+    }
 
     var createAt = Math.round(new Date().getTime()/1000);
     var newScratcher = new Scratcher({
         userName: req.body.userName,
         userCode: req.body.userCode,
         winingCost: req.body.winingCost,
-        winingNumbers: [],
+        isWinner: req.body.isWinner,
+        isWiningNumber: false,
         createdAt: createAt
     });
-
+    
     newScratcher.save(function(err, result){
         if(err){
             return common.send(res, 400, '', err);
         }
         else{
-            return common.send(res, 200, result, 'success');
+            if(req.body.isWinner){
+                Scratcher.findOne({'isWiningNumber':true}, []).exec(function(err, data){
+                    if(err){
+                        return common.send(res, 400, '', err);
+                    }
+                    else{
+                        if(data == null || data == undefined){
+                            return common.send(res, 300, '', 'There is no winning numbers');
+                        }
+                        else{
+                            var winingNumbers = data.winingNumbers;
+                            var index = winingNumbers.indexOf(req.body.winingCost)
+                            if(index > -1)
+                                winingNumbers.splice(index, 1)
+                            
+                            data.winingNumbers = winingNumbers;
+                            data.save(function(err, result){
+                                if(err){
+                                    return common.send(res, 400, '', err);
+                                }
+                                else{
+                                    return common.send(res, 200, '', 'success');
+                                }
+                            })
+
+                        }                        
+                    }
+                })
+            }
+            else{
+                return common.send(res, 200, '', 'success');
+            }
         }
     })
 }
 
 exports.getScratcherWinnerData =  function(req, res) {
-    var Scratcher = mongoose.model("Scratcher", scratcherSchema);
-    Scratcher.find({"winingNumbers":[]}, ['userName', 'userCode', 'winingCost']).sort({'createdAt': -1}).limit(100).exec(function(err, data){
+    var Scratcher = mongoose.model('Scratcher', scratcherSchema);
+    Scratcher.find({'isWiningNumber': false, 'isWinner': true}, ['userName', 'userCode', 'winingCost']).sort({'createdAt': -1}).limit(100).exec(function(err, data){
         if(err){
             return common.send(res, 400, '', err);
         }

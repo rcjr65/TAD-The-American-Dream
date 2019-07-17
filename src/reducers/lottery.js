@@ -2,6 +2,7 @@ import {
     LOTTERY_W_J_T_S,
     LOTTERY_UPDATE_WINNER,
     LOTTERY_ERROR,
+    LOTTERY_SET_SCRATCHER,
     defaultState 
   } from '../actions/lottery';
   
@@ -14,6 +15,12 @@ import {
                 jackpot: action.payload.jackpot,
                 ticketList: action.payload.ticketList,
                 scratcherNumbers: action.payload.scratcherNumbers,
+                scratcherList: action.payload.scratcherList
+            };  
+        case LOTTERY_SET_SCRATCHER:
+            alert('The numbers were set successfully');
+            return {
+                ...state,
                 scratcherList: action.payload.scratcherList
             };  
         case LOTTERY_UPDATE_WINNER:

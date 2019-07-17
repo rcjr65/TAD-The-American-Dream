@@ -2,6 +2,7 @@
 export const LOTTERY_ERROR = 'LOTTERY_ERROR';
 export const LOTTERY_W_J_T_S = 'LOTTERY_W_J_T_S';
 export const LOTTERY_UPDATE_WINNER = 'LOTTERY_UPDATE_WINNER';
+export const LOTTERY_SET_SCRATCHER = 'LOTTERY_SET_SCRATCHER';
 
 import {Backend_EndPoint} from '../constants';
 import { ApiProvider } from '../ApiProvider';
@@ -30,7 +31,7 @@ export function loadWinningJackpotTicketScratcher() {
                 lastWinningNumber: lastWinningNumber.payload?lastWinningNumber.payload.winingNumbers:[0, 0, 0, 0, 0, 0],
                 jackpot: jackpot.payload[0],
                 ticketList: ticketList.payload,
-                scratcherNumbers: scratcherNumbers.payload?scratcherNumbers.payload.winingNumbers:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+                scratcherNumbers: scratcherNumbers.payload?scratcherNumbers.payload.originalWiningNumbers:[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
                 scratcherList: scratcherList.payload,
             }
         });
@@ -82,7 +83,14 @@ export function setScratcherNumber(winingNumbers) {
     return async (dispatch, getState) => {
         try {
             await ApiProvider(Backend_EndPoint + "api/lottery/setScratcherNumber", "POST", {winingNumbers});
-            alert('The numbers were set successfully');
+            var scratcherList = await ApiProvider(Backend_EndPoint + "api/lottery/getScratcherWinnerData/", "GET", null);
+
+            dispatch({
+                type: LOTTERY_SET_SCRATCHER,
+                payload: {
+                    scratcherList: scratcherList.payload,
+                }
+            });
         } catch (error) {
             dispatch({
                 type: LOTTERY_ERROR,

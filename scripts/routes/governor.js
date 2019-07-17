@@ -3,7 +3,7 @@ var mongoose = require('mongoose');
 var constants = require('../../src/constant_backend');
 
 var governorSchema = require('../models/governors').governorSchema;
-var voteSchema = require('../models/votes').voteSchema;
+var voteResultSchema = require('../models/voteResult').voteResultSchema;
 var taxSchema = require('../models/taxes').taxSchema;
 
 exports.all = function(req, res) {
@@ -72,7 +72,7 @@ exports.all = function(req, res) {
 
 exports.update = function(req, res) {
     var Governor = mongoose.model("Governor", governorSchema);
-    var Votes = mongoose.model("Votes", voteSchema);
+    var VoteResult = mongoose.model("VoteResult", voteResultSchema);
 
     if (req.body.id == undefined) {
         return common.send(res, 401, '', 'Id is undefined');
@@ -102,7 +102,7 @@ exports.update = function(req, res) {
     }
 
     if(req.body.isNew){
-        Votes.findOne({ candidacyCode: req.body.userCode }, ['candidacyName'], async function(err, _vote) {
+        VoteResult.findOne({ candidacyCode: req.body.userCode }, ['candidacyName'], async function(err, _vote) {
             if(err){
                 return common.send(res, 400, '', err);
             }
@@ -112,7 +112,7 @@ exports.update = function(req, res) {
                     return common.send(res, 300, '', 'This user didn`t get any votes.');
                 }
                 else{
-                    console.log(_vote.candidacyName);
+                    
                     Governor.findOne({ userCode: req.body.userCode }, async function ( err, _governor){
                         if(err){
                             return common.send(res, 400, '', err);

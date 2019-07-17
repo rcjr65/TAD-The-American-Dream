@@ -244,7 +244,7 @@ class Lottery extends Component {
                         <div className='box payout'>
                             <h2>PROJECTED PAYOUT</h2>
                             <div style={{ padding: '5px', textAlign: 'center' }}>
-                            <h2><span style={{color:'#d8d51a'}}>$&nbsp;&nbsp;</span>{this.state.payout}</h2>
+                            <h2><span style={{color:'#d8d51a'}}>$&nbsp;&nbsp;</span>{this.state.payout.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</h2>
                             </div>
                         </div>
                         <div className='box payout'>
