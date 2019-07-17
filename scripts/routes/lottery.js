@@ -299,6 +299,10 @@ exports.sendScratcherWinnerData =  function(req, res) {
         return common.send(res, 401, '', "The winning cost can't be 0.");
     }
 
+    if(req.body.isWinner == false && req.body.winingCost > 0){
+        return common.send(res, 401, '', "The loser has no winning cost");
+    }
+
     var createAt = Math.round(new Date().getTime()/1000);
     var newScratcher = new Scratcher({
         userName: req.body.userName,
@@ -314,7 +318,7 @@ exports.sendScratcherWinnerData =  function(req, res) {
             return common.send(res, 400, '', err);
         }
         else{
-            if(req.body.isWinner){
+            if(req.body.isWinner ==  true){
                 Scratcher.findOne({'isWiningNumber':true}, []).exec(function(err, data){
                     if(err){
                         return common.send(res, 400, '', err);
