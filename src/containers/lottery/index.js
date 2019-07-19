@@ -34,7 +34,12 @@ class Lottery extends Component {
 
   componentWillReceiveProps(nextProps) {
     if(nextProps.jackpot !== this.props.jackpot){
-        this.setState({jackpot: nextProps.jackpot.value});
+        var _payout = 0
+        if(this.state.payout != 0 && this.props.jackpot.value != 0 ){
+            _payout = (this.state.payout * nextProps.jackpot.value / this.props.jackpot.value)
+        }
+
+        this.setState({jackpot: nextProps.jackpot.value, payout: _payout.toFixed(2)});
     }
   }
 
@@ -136,7 +141,7 @@ class Lottery extends Component {
         var lv6 = {}
         lv6 = {
             userCode: ticket.userCode,
-            payout: parseInt(this.props.jackpot.value, 10)
+            payout: parseFloat(this.props.jackpot.value)
         }
         
         lottoData.push(lv6)
@@ -145,7 +150,7 @@ class Lottery extends Component {
         var lv5 = {} 
         lv5 = {
             userCode: ticket.userCode,
-            payout: parseInt(this.props.jackpot.value, 10) * 0.1
+            payout: parseFloat(this.props.jackpot.value) * 0.1
         }
         
         lottoData.push(lv5)
@@ -154,7 +159,7 @@ class Lottery extends Component {
         var lv4 = {} 
         lv4 = {
             userCode: ticket.userCode,
-            payout: parseInt(this.props.jackpot.value, 10) * 0.01
+            payout: parseFloat(this.props.jackpot.value) * 0.01
         }
         
         lottoData.push(lv4)
@@ -162,7 +167,7 @@ class Lottery extends Component {
     });
 
     lottoData.forEach(element => {
-        payout = parseInt(payout, 10) + parseInt(element.payout, 10)
+        payout = parseFloat(payout) + parseFloat(element.payout)
     });
         
     this.setState({lottoData, payout: payout.toFixed(2)})

@@ -155,8 +155,8 @@ router.get("/getJackpot", function(req, res) {
 
 router.post("/setJackpot", function(req, res) {
     var Jackpot = mongoose.model("Jackpot", jackpotSchema);
-
-    Jackpot.findOne({ id: req.body.auctionId }, async function(err, _jackpot) {
+    
+    Jackpot.findOne({ _id: req.body.id }, async function(err, _jackpot) {
         if(!err){
             if (_jackpot == "undefined" || _jackpot == null) {
                 var nJackpot = new Jackpot({
@@ -167,10 +167,10 @@ router.post("/setJackpot", function(req, res) {
                 _jackpot.value = req.body.value;
                 await _jackpot.save();
             }      
-            return res.send(true);
+            return common.send(res, 200, '', 'Success');
         }
         else{
-            return res.send(false);
+            return common.send(res, 300, '', err);
         }
     });
 });

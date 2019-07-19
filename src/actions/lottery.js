@@ -3,13 +3,14 @@ export const LOTTERY_ERROR = 'LOTTERY_ERROR';
 export const LOTTERY_W_J_T_S = 'LOTTERY_W_J_T_S';
 export const LOTTERY_UPDATE_WINNER = 'LOTTERY_UPDATE_WINNER';
 export const LOTTERY_SET_SCRATCHER = 'LOTTERY_SET_SCRATCHER';
+export const UPDATE_JACKPOT = 'UPDATE_JACKPOT';
 
 import {Backend_EndPoint} from '../constants';
 import { ApiProvider } from '../ApiProvider';
 
 export const defaultState = {
     lastWinningNumber: [0, 0, 0, 0, 0, 0],
-    jackpot: null,
+    jackpot: {_id: 0, value: 0},
     ticketList: [],
     scratcherNumbers: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
     scratcherList: [],
@@ -68,7 +69,15 @@ export function saveJackPot(id, value) {
     return async (dispatch, getState) => {
         try {
             await ApiProvider(Backend_EndPoint + "setJackpot", "POST", {id, value});
-            alert('Success');
+            dispatch({
+                type: UPDATE_JACKPOT,
+                payload: {
+                    jackpot: {
+                        _id: id,
+                        value
+                    },
+                }
+            });
         } catch (error) {
             dispatch({
                 type: LOTTERY_ERROR,
