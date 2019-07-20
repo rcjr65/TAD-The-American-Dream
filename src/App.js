@@ -42,8 +42,8 @@ class App extends Component {
                                     <Link
                                         style={this.state.active === 'LOTTERY' ? activeStyle : {}} 
                                         onClick={() => this._handleClick('LOTTERY')} 
-                                        to='/lottery' >
-                                        LOTTERY
+                                        to='/dream-stakes' >
+                                        DREAMSTAKES
                                     </Link>
                                 </li>
                                 <li>
@@ -76,7 +76,7 @@ class App extends Component {
                     <div className='App-intro'>
                         <Switch>
                             <Route exact path='/' component={Home} />
-                            <Route path='/lottery' component={Lottery} />
+                            <Route path='/dream-stakes' component={Lottery} />
                             <Route path='/auction' component={Auction} />
                             <Route path='/election' component={Election} />
                             <Route path='/tdd' component={Tdd} />

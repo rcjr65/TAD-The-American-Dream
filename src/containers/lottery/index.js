@@ -9,7 +9,7 @@ library.add(faEdit, faSave, faTrash);
 import Tickets from '../../components/tickets';
 import Scratcher from '../../components/scratcher';
 import ScratcherWinners from '../../components/scratcherWinners';
-import {loadWinningJackpotTicketScratcher, setWinnerNumber, saveJackPot, setScratcherNumber} from '../../actions/lottery';
+import {loadWinningJackpotTicketScratcher, setWinnerNumber, saveJackPot, setScratcherNumber, saveDreamBank} from '../../actions/lottery';
 import '../../css/oswald.css';
 import '../../css/open-sans.css';
 import '../../css/pure-min.css';
@@ -22,7 +22,9 @@ class Lottery extends Component {
     this.state = {
         winningNumbers: [0, 0, 0, 0, 0, 0],
         isEditJackPot: false,
+        isEditDreamBank: false,
         jackpot: 0,
+        dreamBank: 0,
         scratcherNumbers: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         payout: 0,
         lottoData: []
@@ -41,6 +43,11 @@ class Lottery extends Component {
 
         this.setState({jackpot: nextProps.jackpot.value, payout: _payout.toFixed(2)});
     }
+
+    if(nextProps.balance !== this.props.balance){
+        this.setState({dreamBank: nextProps.balance})
+    }
+
   }
 
   trClassFormat = (state, rowData, column)=> {
@@ -107,6 +114,16 @@ class Lottery extends Component {
   saveJackPot = () =>{
         this.props.saveJackPot(this.props.jackpot._id, this.state.jackpot);
         this.setState({isEditJackPot: false});
+  }
+
+  editDreamBank = () =>{
+    this.dreamBankInput.focus();
+    this.setState({isEditDreamBank: true})
+  }
+
+  saveDreamBank = () =>{
+    this.props.saveDreamBank(this.state.dreamBank);
+    this.setState({isEditDreamBank: false});
   }
 
   getMatchingElementCount(left, right) {
@@ -205,7 +222,7 @@ class Lottery extends Component {
       <div className='containers'>
         <div className='lottWrapper'>
             <div className='box'>
-                <h2>LOTTO</h2>
+                <h2>TAD&nbsp;&nbsp;MEGA</h2>
                 <div className='row'>
                     <div className='col-md-6'>
                         <Tickets ticketList={this.props.ticketList} trClassFormat={(s, r, c)=>this.trClassFormat(s, r, c)}/>
@@ -247,13 +264,13 @@ class Lottery extends Component {
                             <button className='btn btn-success'  style={{width: '150px'}} onClick={() => this.randomizeWinner()}>RANDOMIZE</button>
                         </div>
                         <div className='box payout'>
-                            <h2>PROJECTED PAYOUT</h2>
+                            <h2>PROJECTED&nbsp;&nbsp;PAYOUT</h2>
                             <div style={{ padding: '5px', textAlign: 'center' }}>
                             <h2><span style={{color:'#d8d51a'}}>$&nbsp;&nbsp;</span>{this.state.payout.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}</h2>
                             </div>
                         </div>
                         <div className='box payout'>
-                            <h2>LAST WINNING NUMBERS</h2>
+                            <h2>LAST&nbsp;&nbsp;WINNING&nbsp;&nbsp;NUMBERS</h2>
                             <div style={{ padding: '5px', textAlign: 'center' }}>
                             <h2>{this.props.lastWinningNumber[0]+
                             ', '+this.props.lastWinningNumber[1]+
@@ -270,35 +287,64 @@ class Lottery extends Component {
         </div>
         <div className='scratcherWrapper'>
             <div className='row'>
-                <div className="box col-md-6">
-                    <h2>CURRENT JACKPOT</h2>
-                    <div style={{
-                            marginTop: "10px",
-                            marginBottom: "10px",
-                            display: "flex",
-                            justifyContent: "center",
-                            alignItems: "center"
-                    }}>              
-                        <span style={{ fontSize: "30px", color: "white", fontWeight: "bold", marginRight: "5px", textAlign: "left" }}>$</span>
-                        <input
-                            ref={(input) => { this.jackpotInput = input; }} 
-                            value={ this.state.isEditJackPot?this.state.jackpot: this.state.jackpot.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
-                            onChange={(event)=>this.setState({ jackpot: event.target.value })}
-                            style={{ backgroundColor: "transparent", border: "none", fontSize: "30px", color: "white", fontWeight: "bold", marginRight: "20px", width: "70%", textAlign: "left"}}
-                            readOnly={this.state.isEditJackPot?false:true }/>
-                        
-                        <div onClick={()=>{
-                            if(this.state.isEditJackPot)
-                                return this.saveJackPot();
-                            else
-                                return this.editJackPot();
-                            }}>
-                            <FontAwesomeIcon size="lg" color="white" icon={this.state.isEditJackPot?"save":"edit" } />
+                <div className="col-md-6">
+                    <div className="box col-md-12" style={{marginTop: 0, marginBottom: '30px', marginLeft: 0, marginRight: 0}}>
+                        <h2>CURRENT&nbsp;&nbsp;MEGA&nbsp;&nbsp;JACKPOT</h2>
+                        <div style={{
+                                marginTop: "20px",
+                                marginBottom: "20px",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center"
+                        }}>              
+                            <span style={{ fontSize: "30px", color: "white", fontWeight: "bold", marginRight: "5px", textAlign: "left" }}>$</span>
+                            <input
+                                ref={(input) => { this.jackpotInput = input; }} 
+                                value={ this.state.isEditJackPot?this.state.jackpot: this.state.jackpot.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                onChange={(event)=>this.setState({ jackpot: event.target.value })}
+                                style={{ backgroundColor: "transparent", border: "none", fontSize: "30px", color: "white", fontWeight: "bold", marginRight: "20px", width: "70%", textAlign: "left"}}
+                                readOnly={this.state.isEditJackPot?false:true }/>
+                            
+                            <div onClick={()=>{
+                                if(this.state.isEditJackPot)
+                                    return this.saveJackPot();
+                                else
+                                    return this.editJackPot();
+                                }}>
+                                <FontAwesomeIcon size="lg" color="white" icon={this.state.isEditJackPot?"save":"edit" } />
+                            </div>
                         </div>
-                    </div>              
+                    </div>
+                    <div className="box col-md-12" style={{margin: 0}}>
+                        <h2>DREAM&nbsp;&nbsp;MACHINE&nbsp;&nbsp;BANK</h2>
+                        <div style={{
+                                marginTop: "20px",
+                                marginBottom: "20px",
+                                display: "flex",
+                                justifyContent: "center",
+                                alignItems: "center"
+                        }}>              
+                            <span style={{ fontSize: "30px", color: "white", fontWeight: "bold", marginRight: "5px", textAlign: "left" }}>$</span>
+                            <input
+                                ref={(input) => { this.dreamBankInput = input; }} 
+                                value={ this.state.isEditDreamBank?this.state.dreamBank: this.state.dreamBank.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",")}
+                                onChange={(event)=>this.setState({ dreamBank: event.target.value })}
+                                style={{ backgroundColor: "transparent", border: "none", fontSize: "30px", color: "white", fontWeight: "bold", marginRight: "20px", width: "70%", textAlign: "left"}}
+                                readOnly={this.state.isEditDreamBank?false:true }/>
+                            
+                            <div onClick={()=>{
+                                if(this.state.isEditDreamBank)
+                                    return this.saveDreamBank();
+                                else
+                                    return this.editDreamBank();
+                                }}>
+                                <FontAwesomeIcon size="lg" color="white" icon={this.state.isEditDreamBank?"save":"edit" } />
+                            </div>
+                        </div>
+                    </div>
                 </div>
                 <div className="box col-md-6">
-                    <h2>SCRATCHER</h2>
+                    <h2>DREAM&nbsp;&nbsp;TICKET</h2>
                     <div className="row vertical-center">
                         <div className="col-md-7">
                             <div className='box winners'>
@@ -329,7 +375,8 @@ const mapDispatchToProps = {
     loadWinningJackpotTicketScratcher,
     setWinnerNumber,
     saveJackPot,
-    setScratcherNumber
+    setScratcherNumber,
+    saveDreamBank
 };
 
 const mapStateToProps = ({lottery}) => ({
@@ -338,6 +385,7 @@ const mapStateToProps = ({lottery}) => ({
     ticketList: lottery.ticketList,
     scratcherNumbers: lottery.scratcherNumbers,
     scratcherList: lottery.scratcherList,
+    balance: lottery.balance,
     error: lottery.error,
 });
 

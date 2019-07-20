@@ -53,6 +53,7 @@
     "@fortawesome/react-fontawesome": "^0.1.4",
     "cookie-parser": "^1.4.4",
     "dotenv": "^2.0.0",
+    "firebase-admin": "^8.2.0",
     "http": "^0.0.0",
     "konva": "^3.3.3",
     "moment": "^2.24.0",

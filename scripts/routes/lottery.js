@@ -1,4 +1,5 @@
 var common = require('./common');
+var firebase = require('./firebase.js');
 var mongoose = require('mongoose');
 
 var ticketSchema = require('../models/tickets').ticketSchema;
@@ -364,4 +365,29 @@ exports.getScratcherWinnerData =  function(req, res) {
             return common.send(res, 200, data, 'success');
         }
     })
+}
+
+exports.getDreamBankBalance =  function(req, res) {
+    var ref = firebase.db.ref("/DreamSlot/Cash");
+    ref.once("value", function(snapshot) {
+        return common.send(res, 200, snapshot.val(), 'success');
+    }, function (errorObject) {
+        return common.send(res, 400, '', errorObject.code);
+    });
+}
+
+exports.updateDreamBankBalance =  function(req, res) {
+    if (req.body.balance == undefined) {
+        return common.send(res, 401, '', 'balance is undefined');
+    }
+
+    var ref = firebase.db.ref("/DreamSlot");
+    ref.set({ Cash : parseFloat(req.body.balance)}, function (error) {
+        if (error) {
+            // The write failed...
+            return common.send(res, 400, '', error.code);
+        } else {
+            return common.send(res, 200, '', 'success');
+        }
+    });
 }

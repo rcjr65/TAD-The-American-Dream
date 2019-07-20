@@ -46,6 +46,8 @@ router.post("/lottery/setScratcherNumber", lottery.setScratcherNumber);
 router.get("/lottery/getScratcherNumber", lottery.getScratcherNumber);
 router.post("/lottery/sendScratcherWinnerData", lottery.sendScratcherWinnerData);
 router.get("/lottery/getScratcherWinnerData", lottery.getScratcherWinnerData);
+router.get("/lottery/getDreamBankBalance", lottery.getDreamBankBalance);
+router.post("/lottery/updateDreamBankBalance", lottery.updateDreamBankBalance);
 
 router.get("/tax/getGovTax", tax.getGovTax);
 router.post("/tax/setGovTax", tax.setGovTax);

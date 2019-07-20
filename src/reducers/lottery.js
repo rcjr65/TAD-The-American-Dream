@@ -4,6 +4,7 @@ import {
     LOTTERY_ERROR,
     LOTTERY_SET_SCRATCHER,
     UPDATE_JACKPOT,
+    LOTTERY_UPDATE_DREAM_BANK,
     defaultState 
   } from '../actions/lottery';
   
@@ -16,13 +17,20 @@ import {
                 jackpot: action.payload.jackpot,
                 ticketList: action.payload.ticketList,
                 scratcherNumbers: action.payload.scratcherNumbers,
-                scratcherList: action.payload.scratcherList
+                scratcherList: action.payload.scratcherList,
+                balance: action.payload.balance
             };  
         case UPDATE_JACKPOT:
             alert('Success');
             return {
                 ...state,
                 jackpot: action.payload.jackpot,
+            };  
+        case LOTTERY_UPDATE_DREAM_BANK:
+            alert('Success');
+            return {
+                ...state,
+                balance: action.payload.balance,
             };  
         case LOTTERY_SET_SCRATCHER:
             alert('The numbers were set successfully');
