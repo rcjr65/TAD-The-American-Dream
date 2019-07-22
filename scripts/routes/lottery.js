@@ -296,12 +296,12 @@ exports.sendScratcherWinnerData =  function(req, res) {
         return common.send(res, 401, '', 'isWinner is undefined');
     }
 
-    if(req.body.isWinner == true && (req.body.winingCost == 0 || req.body.winingCost == '' || req.body.winingCost == '0')){
+    if(req.body.isWinner == 'true' && (req.body.winingCost == 0 || req.body.winingCost == '' || req.body.winingCost == '0')){
         return common.send(res, 401, '', "The winning cost can't be 0.");
     }
 
-    if(req.body.isWinner == false && req.body.winingCost > 0){
-        return common.send(res, 401, '', "The loser has no winning cost");
+    if( req.body.isWinner != 'true' && req.body.winingCost > 0 ){
+        return common.send(res, 401, '', "The loser has no winning cost more than 0");            
     }
 
     var createAt = Math.round(new Date().getTime()/1000);
@@ -314,28 +314,28 @@ exports.sendScratcherWinnerData =  function(req, res) {
         createdAt: createAt
     });
     
-    newScratcher.save(function(err, result){
-        if(err){
-            return common.send(res, 400, '', err);
-        }
-        else{
-            if(req.body.isWinner ==  true){
-                Scratcher.findOne({'isWiningNumber':true}, []).exec(function(err, data){
-                    if(err){
-                        return common.send(res, 400, '', err);
-                    }
-                    else{
-                        if(data == null || data == undefined){
-                            return common.send(res, 300, '', 'There is no winning numbers');
+    if(req.body.isWinner == 'true'){
+        Scratcher.findOne({'isWiningNumber':true}, []).exec(function(err, data){
+            if(err){
+                return common.send(res, 400, '', err);
+            }
+            else{
+                if(data == null || data == undefined){
+                    return common.send(res, 300, '', 'There is no winning numbers');
+                }
+                else{
+                    var winingNumbers = data.winingNumbers;
+                    var index = winingNumbers.indexOf(req.body.winingCost)
+                    if(index > -1)
+                        winingNumbers.splice(index, 1)
+                    
+                    data.winingNumbers = winingNumbers;
+                    data.save(function(err, result){
+                        if(err){
+                            return common.send(res, 400, '', err);
                         }
                         else{
-                            var winingNumbers = data.winingNumbers;
-                            var index = winingNumbers.indexOf(req.body.winingCost)
-                            if(index > -1)
-                                winingNumbers.splice(index, 1)
-                            
-                            data.winingNumbers = winingNumbers;
-                            data.save(function(err, result){
+                            newScratcher.save(function(err, result){
                                 if(err){
                                     return common.send(res, 400, '', err);
                                 }
@@ -343,16 +343,23 @@ exports.sendScratcherWinnerData =  function(req, res) {
                                     return common.send(res, 200, '', 'success');
                                 }
                             })
+                        }
+                    })
 
-                        }                        
-                    }
-                })
+                }                        
+            }
+        })
+    }
+    else{
+        newScratcher.save(function(err, result){
+            if(err){
+                return common.send(res, 400, '', err);
             }
             else{
                 return common.send(res, 200, '', 'success');
             }
-        }
-    })
+        })
+    }
 }
 
 exports.getScratcherWinnerData =  function(req, res) {

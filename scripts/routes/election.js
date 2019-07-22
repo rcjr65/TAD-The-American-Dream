@@ -28,7 +28,7 @@ exports.vote = function(req, res) {
         return common.send(res, 401, '', 'candidacyName is undefined');
     }
     
-    Votes.findOne({ userCode: req.body.userCode }, async function ( err, _vote){
+    Votes.findOne({ userCode: req.body.userCode.toUpperCase() }, async function ( err, _vote){
         if(err){
             return common.send(res, 400, '', err);
         }
@@ -36,20 +36,20 @@ exports.vote = function(req, res) {
             if (_vote == undefined || _vote == null) {
                 var model = new Votes({
                     userName: req.body.userName,
-                    userCode: req.body.userCode,
-                    candidacyCode: req.body.candidacyCode,
+                    userCode: req.body.userCode.toUpperCase(),
+                    candidacyCode: req.body.candidacyCode.toUpperCase(),
                     candidacyName: req.body.candidacyName,
                 });
                 await model.save();
                 
-                VoteResult.findOne({ candidacyCode: req.body.candidacyCode }, async function ( err, _voteResult){
+                VoteResult.findOne({ candidacyCode: req.body.candidacyCode.toUpperCase() }, async function ( err, _voteResult){
                     if(err){
                         return common.send(res, 400, '', err);
                     }
                     else{
                         if (_voteResult == undefined || _voteResult == null) {
                             var _model = new VoteResult({
-                                candidacyCode: req.body.candidacyCode,
+                                candidacyCode: req.body.candidacyCode.toUpperCase(),
                                 candidacyName: req.body.candidacyName,
                                 votes: 1
                             });
@@ -72,7 +72,7 @@ exports.vote = function(req, res) {
 exports.result = function(req, res) {
 
     var VoteResult = mongoose.model("VoteResult", voteResultSchema);
-    VoteResult.find({"votes":{$ne:0}}).sort({'votes': -1}).exec(function(err, data){
+    VoteResult.find({"votes":{$ne:0}}).sort({'votes': -1}).limit(50).exec(function(err, data){
         if(err){
             return common.send(res, 400, '', err);
         }
@@ -185,7 +185,7 @@ exports.edit = function(req, res) {
         return common.send(res, 401, '', 'candidacyCode is undefined');
     }
 
-    VoteResult.findOne({ candidacyCode: req.body.candidacyCode }, async function ( err, _voteResult){
+    VoteResult.findOne({ candidacyCode: req.body.candidacyCode.toUpperCase() }, async function ( err, _voteResult){
         if(err){
             return common.send(res, 400, '', err);
         }

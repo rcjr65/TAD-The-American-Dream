@@ -109,7 +109,7 @@ exports.update = function(req, res) {
             else{
                 
                 if (_vote == undefined || _vote == null) {
-                    return common.send(res, 300, '', 'This user didn`t get any votes.');
+                    return common.send(res, 300, '', "This user didn't get any votes.");
                 }
                 else{
                     
