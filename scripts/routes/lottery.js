@@ -296,11 +296,11 @@ exports.sendScratcherWinnerData =  function(req, res) {
         return common.send(res, 401, '', 'isWinner is undefined');
     }
 
-    if(req.body.isWinner == 'true' && (req.body.winingCost == 0 || req.body.winingCost == '' || req.body.winingCost == '0')){
+    if(req.body.isWinner == 'true' && parseFloat(req.body.winingCost) == 0){
         return common.send(res, 401, '', "The winning cost can't be 0.");
     }
 
-    if( req.body.isWinner != 'true' && req.body.winingCost > 0 ){
+    if( req.body.isWinner != 'true' && parseFloat(req.body.winingCost) > 0 ){
         return common.send(res, 401, '', "The loser has no winning cost more than 0");            
     }
 
@@ -308,7 +308,7 @@ exports.sendScratcherWinnerData =  function(req, res) {
     var newScratcher = new Scratcher({
         userName: req.body.userName,
         userCode: req.body.userCode,
-        winingCost: req.body.winingCost,
+        winingCost: parseFloat(req.body.winingCost),
         isWinner: req.body.isWinner,
         isWiningNumber: false,
         createdAt: createAt
@@ -325,10 +325,12 @@ exports.sendScratcherWinnerData =  function(req, res) {
                 }
                 else{
                     var winingNumbers = data.winingNumbers;
-                    var index = winingNumbers.indexOf(req.body.winingCost)
+                    var index = winingNumbers.indexOf(parseFloat(req.body.winingCost))
                     if(index > -1)
                         winingNumbers.splice(index, 1)
-                    
+                    else
+                        return common.send(res, 300, '', 'Incorrect winning number');
+
                     data.winingNumbers = winingNumbers;
                     data.save(function(err, result){
                         if(err){

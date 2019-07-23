@@ -140,61 +140,75 @@ exports.buy =  function(req, res) {
         createdAt: createAt
     });
 
-    newTrack.save(function(err, result){
+    
+    Item.findOne({itemId : req.body.itemId}).exec(function(err, data){
         if(err){
             return common.send(res, 400, '', err);
         }
         else{
-            Item.findOne({itemId : req.body.itemId}).exec(function(err, data){
-                if(err){
-                    return common.send(res, 400, '', err);
+            if (data == undefined || data == null) {
+                return common.send(res, 300, '', 'No exists.');
+            }
+            else{
+                var availableStock = parseInt(data.stock) - parseInt(req.body.quantity);
+                if(availableStock < 0){
+                    return common.send(res, 300, '', 'Stock is not enough');
                 }
                 else{
-                    if (data == undefined || data == null) {
-                        return common.send(res, 300, '', 'No exists.');
-                    }
-                    else{
-                        
-                        data.stock = parseInt(data.stock) - parseInt(req.body.quantity);
-        
-                        data.save(function(err, result){
-                            if(err){
-                                return common.send(res, 400, '', err);
-                            }
-                            else{
-                                if(req.body.isAuctionItem == 1){
-                                    Auction.findOne({buyPrice : {$ne: 0}, itemId: req.body.itemId}).exec(function(auctionErr, auctionData){
-                                        if(auctionErr){
-                                            return common.send(res, 400, '', auctionErr);
+                    
+                    data.stock = availableStock;
+
+                    data.save(function(err, result){
+                        if(err){
+                            return common.send(res, 400, '', err);
+                        }
+                        else{
+                            if(req.body.isAuctionItem == 1){
+                                Auction.findOne({buyPrice : {$ne: 0}, itemId: req.body.itemId}).exec(function(auctionErr, auctionData){
+                                    if(auctionErr){
+                                        return common.send(res, 400, '', auctionErr);
+                                    }
+                                    else{
+                                        if (auctionData == undefined || auctionData == null) {
+                                            return common.send(res, 300, '', 'No exists.');
                                         }
                                         else{
-                                            if (auctionData == undefined || auctionData == null) {
-                                                return common.send(res, 300, '', 'No exists.');
-                                            }
-                                            else{
-                                                auctionData.bidPrice = req.body.price;
-                                                auctionData.biderName = req.body.ownerName;
-                                                auctionData.biderGamerCode = req.body.ownerGamerCode;
-                                                auctionData.save(function(err, result){
-                                                    if(err){
-                                                        return common.send(res, 400, '', err);
-                                                    }
-                                                    else{
-                                                        return common.send(res, 200, '', 'success');
-                                                    }
-                                                })
-                                            }
+                                            auctionData.bidPrice = req.body.price;
+                                            auctionData.biderName = req.body.ownerName;
+                                            auctionData.biderGamerCode = req.body.ownerGamerCode;
+                                            auctionData.save(function(err, result){
+                                                if(err){
+                                                    return common.send(res, 400, '', err);
+                                                }
+                                                else{
+                                                    newTrack.save(function(err, result){
+                                                        if(err){
+                                                            return common.send(res, 400, '', err);
+                                                        }
+                                                        else{
+                                                            return common.send(res, 200, '', 'success');
+                                                        }
+                                                    });
+                                                }
+                                            })
                                         }
-                                    });
-                                }
-                                else{
-                                    return common.send(res, 200, '', 'success');
-                                }
+                                    }
+                                });
                             }
-                        });
-                    }
-                }
-            });
+                            else{
+                                newTrack.save(function(err, result){
+                                    if(err){
+                                        return common.send(res, 400, '', err);
+                                    }
+                                    else{
+                                        return common.send(res, 200, '', 'success');
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }                
+            }               
         }
     });    
 }

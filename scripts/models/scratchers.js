@@ -8,7 +8,7 @@ var scratcherSchema = new mongoose.Schema({
   userCode: String,
   originalWiningNumbers: [],
   winingNumbers: [],
-  winingCost: String,
+  winingCost: Number,
   isWinner: Boolean,
   isWiningNumber: Boolean,
   createdAt: String,

@@ -48,6 +48,10 @@ class Lottery extends Component {
         this.setState({dreamBank: nextProps.balance})
     }
 
+    if(nextProps.scratcherNumbers !== this.props.scratcherNumbers){
+        this.setState({scratcherNumbers: nextProps.scratcherNumbers})
+    }
+
   }
 
   trClassFormat = (state, rowData, column)=> {
@@ -78,15 +82,13 @@ class Lottery extends Component {
   onChangeScratcher = (event, index) => {
     var arr = this.props.scratcherNumbers;
     arr[index] = event.target.value;
-    
     this.setState({scratcherNumbers: arr});
   }
 
   setScratcher = async () => {
-    if(this.state.scratcherNumbers.length != 25)
-      return alert("Please fill all winning numbers.");
-
-    this.props.setScratcherNumber(this.state.scratcherNumbers);    
+    var scratcherNumbers = this.state.scratcherNumbers.map(x => parseFloat(x))    
+    this.props.setScratcherNumber(scratcherNumbers);
+    this.setState({scratcherNumbers})
   }
 
   setNumbers = () => {
@@ -357,7 +359,7 @@ class Lottery extends Component {
                         </div>
                         <div className="col-md-5">
                             <Scratcher 
-                                scratcherNumbers={this.props.scratcherNumbers}
+                                scratcherNumbers={this.state.scratcherNumbers}
                                 onChangeScratcher={(e, value)=>this.onChangeScratcher(e, value)}
                                 setScratcher={()=>this.setScratcher()}
                             />
