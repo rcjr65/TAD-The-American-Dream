@@ -4,7 +4,7 @@ var mongoose = restful.mongoose;
 
 var auctionSchema = new mongoose.Schema({
   auctionId: mongoose.Schema.Types.ObjectId,
-  itemId: String,
+  itemId: Number,
   itemName: String,
   itemCategory: String,
   minPrice: {type: Number, default: 0},
