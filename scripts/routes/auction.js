@@ -40,6 +40,8 @@ exports.post =  function(req, res) {
         itemCategory: req.body.itemCategory,
         minPrice: req.body.minPrice,
         bidPrice: 0,
+        oFlag: 0,
+        bFlag: 0,
         buyPrice: req.body.buyPrice == undefined ? 0 : req.body.buyPrice,
         ownerGamerCode: req.body.ownerGamerCode,
         ownerName: req.body.ownerName,
@@ -59,7 +61,8 @@ exports.post =  function(req, res) {
 
 exports.get =  function(req, res) {
     var Auction = mongoose.model('Auction', auctionSchema);
-    Auction.find({bidPrice:0}).sort({'createdAt': 1}).exec(function(err, data){
+    var createAt = Math.round(new Date().getTime()/1000);
+    Auction.find({bidPrice:0, expiry: {$gt: createAt}}).sort({'createdAt': 1}).exec(function(err, data){
         if(err){
             return common.send(res, 400, '', err);
         }
@@ -71,7 +74,8 @@ exports.get =  function(req, res) {
 
 exports.result =  function(req, res) {
     var Auction = mongoose.model('Auction', auctionSchema);
-    Auction.find({bidPrice:{$ne: 0}}, ['itemId', 'itemName', 'itemCategory', 'ownerGamerCode', 'ownerName', 'biderGamerCode', 'biderName', 'minPrice', 'bidPrice', 'buyPrice']).sort({'createdAt': 1}).exec(function(err, data){
+    var createAt = Math.round(new Date().getTime()/1000);
+    Auction.find({bidPrice:{$ne: 0}, expiry: {$gt: createAt}}, ['itemId', 'itemName', 'itemCategory', 'ownerGamerCode', 'ownerName', 'biderGamerCode', 'biderName', 'minPrice', 'bidPrice', 'buyPrice', 'oFlag', 'bFlag']).sort({'createdAt': 1}).exec(function(err, data){
         if(err){
             return common.send(res, 400, '', err);
         }
@@ -162,6 +166,8 @@ exports.bid =  function(req, res) {
                                     ownerGamerCode: data.ownerGamerCode,
                                     ownerName: data.ownerName,
                                     minPrice: data.minPrice,
+                                    oFlag: 0,
+                                    bFlag: 0,
                                     expiry: data.expiry,
                                 });
                 
@@ -212,15 +218,56 @@ exports.delete =  function(req, res) {
         return common.send(res, 401, '', 'auctionId is undefined');
     }
 
-    Auction.deleteOne({ $or:[ {_id: req.body.auctionId}, {biderItemId: req.body.auctionId}]}, function (err) {
-        if(err){
-            return common.send(res, 400, '', err);
+    if (req.body.isOwner == undefined) { // 0 : owner , 1: bidder
+        return common.send(res, 401, '', 'isOwner is undefined');
+    }
+
+    Auction.findOne({_id: req.body.auctionId}).exec(function(auctionErr, auctionData){
+        if(auctionErr){
+            return common.send(res, 400, '', auctionErr);
         }
         else{
-            return common.send(res, 200, '', 'success');
-        }
-    });
+            if (auctionData == undefined || auctionData == null) {
+                return common.send(res, 300, '', 'No exists.');
+            }
+            else{
+                if((req.body.isOwner == 0 && auctionData.bFlag == 1) || (req.body.isOwner == 1 && auctionData.oFlag == 1)){
+                    Auction.deleteOne({ $or:[ {_id: req.body.auctionId}, {biderItemId: req.body.auctionId}]}, function (err) {
+                        if(err){
+                            return common.send(res, 400, '', err);
+                        }
+                        else{
+                            return common.send(res, 200, '', 'success');
+                        }
+                    });
+                }
+                else if(req.body.isOwner == 0 && auctionData.bFlag == 0){
+                    auctionData.oFlag = 1;
 
+                    auctionData.save(function(err, result){
+                        if(err){
+                            return common.send(res, 400, '', err);
+                        }
+                        else{
+                            return common.send(res, 200, '', 'success');
+                        }
+                    })
+                }
+                else {
+                    auctionData.bFlag = 1;
+
+                    auctionData.save(function(err, result){
+                        if(err){
+                            return common.send(res, 400, '', err);
+                        }
+                        else{
+                            return common.send(res, 200, '', 'success');
+                        }
+                    })
+                }
+            }
+        }
+    })
 }
 
 exports.buy =  function(req, res) {

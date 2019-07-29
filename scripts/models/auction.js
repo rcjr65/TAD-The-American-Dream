@@ -15,7 +15,9 @@ var auctionSchema = new mongoose.Schema({
     ownerName: String, //coinbase
     biderGamerCode: String, //coinbase
     biderName: String, //coinbase
-    biderItemId: Number, //coinbase
+    biderItemId: String, //coinbase
+    oFlag: { type: Number, default: 0 }, //0: default, 1: set
+    bFlag: { type: Number, default: 0 }, //0: default, 1: set
     expiry: String,
     createdAt: String
 });
