@@ -122,9 +122,9 @@ exports.buy =  function(req, res) {
         return common.send(res, 401, '', 'isTSR is undefined');
     }
     
-    if (req.body.isAuctionItem == undefined) { // 1: auction item, 0: item
-        return common.send(res, 401, '', 'isAuctionItem is undefined');
-    }
+    // if (req.body.isAuctionItem == undefined) { // 1: auction item, 0: item
+    //     return common.send(res, 401, '', 'isAuctionItem is undefined');
+    // }
 
     var createAt = Math.round(new Date().getTime()/1000);
                 
@@ -140,20 +140,24 @@ exports.buy =  function(req, res) {
         createdAt: createAt
     });
 
-    if(req.body.isAuctionItem == 1){
-        Auction.findOne({buyPrice : {$ne: 0}, itemId: req.body.itemId}).exec(function(auctionErr, auctionData){
-            if(auctionErr){
-                return common.send(res, 400, '', auctionErr);
+    Item.findOne({itemId : req.body.itemId}).exec(function(err, data){
+        if(err){
+            return common.send(res, 400, '', err);
+        }
+        else{
+            if (data == undefined || data == null) {
+                return common.send(res, 300, '', 'No exists.');
             }
             else{
-                if (auctionData == undefined || auctionData == null) {
-                    return common.send(res, 300, '', 'No exists.');
+                var availableStock = parseInt(data.stock) - parseInt(req.body.quantity);
+                if(availableStock < 0){
+                    return common.send(res, 300, '', 'Stock is not enough');
                 }
                 else{
-                    auctionData.bidPrice = req.body.price;
-                    auctionData.biderName = req.body.ownerName;
-                    auctionData.biderGamerCode = req.body.ownerGamerCode;
-                    auctionData.save(function(err, result){
+                    
+                    data.stock = availableStock;
+
+                    data.save(function(err, result){
                         if(err){
                             return common.send(res, 400, '', err);
                         }
@@ -167,49 +171,11 @@ exports.buy =  function(req, res) {
                                 }
                             });
                         }
-                    })
+                    });
                 }
             }
-        });
-    }
-    else{
-        Item.findOne({itemId : req.body.itemId}).exec(function(err, data){
-            if(err){
-                return common.send(res, 400, '', err);
-            }
-            else{
-                if (data == undefined || data == null) {
-                    return common.send(res, 300, '', 'No exists.');
-                }
-                else{
-                    var availableStock = parseInt(data.stock) - parseInt(req.body.quantity);
-                    if(availableStock < 0){
-                        return common.send(res, 300, '', 'Stock is not enough');
-                    }
-                    else{
-                        
-                        data.stock = availableStock;
-    
-                        data.save(function(err, result){
-                            if(err){
-                                return common.send(res, 400, '', err);
-                            }
-                            else{
-                                newTrack.save(function(err, result){
-                                    if(err){
-                                        return common.send(res, 400, '', err);
-                                    }
-                                    else{
-                                        return common.send(res, 200, '', 'success');
-                                    }
-                                });
-                            }
-                        });
-                    }
-                }
-            }
-        });
-    } 
+        }
+    }); 
 }
 
 exports.track =  function(req, res) {

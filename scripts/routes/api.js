@@ -37,6 +37,7 @@ router.post("/auction/post", auction.post);
 router.get("/auction/get", auction.get);
 router.get("/auction/result", auction.result);
 router.post("/auction/delete", auction.delete);
+router.post("/auction/buy", auction.buy);
 router.post("/lottery/sendPickData", lottery.sendPickData);
 router.get("/lottery/getPickData", lottery.getPickData);
 router.post("/lottery/setWinnerNumber", lottery.setWinnerNumber);
