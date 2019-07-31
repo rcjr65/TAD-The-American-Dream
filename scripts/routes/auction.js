@@ -326,7 +326,7 @@ exports.buy =  function(req, res) {
     });
 
     
-    Auction.findOne({buyPrice : {$ne: 0}, _id: req.body.auctionId}).exec(function(auctionErr, auctionData){
+    Auction.findOne({_id: req.body.auctionId}).exec(function(auctionErr, auctionData){
         if(auctionErr){
             return common.send(res, 400, '', auctionErr);
         }
