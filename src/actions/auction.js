@@ -73,13 +73,19 @@ export function loadData() {
         try {
             var item = await ApiProvider(Backend_EndPoint + "api/item/get", "GET", null);
             var track = await ApiProvider(Backend_EndPoint + "api/item/track", "GET", null);
-            var auction = await ApiProvider(Backend_EndPoint + "api/auction/result/", "GET",null);
+            var auction = await ApiProvider(Backend_EndPoint + "api/auction/result/", "GET", null);
+            var _temp = []
+            auction.payload.forEach(element => {
+                if(element.bidPrice != 0){
+                    _temp.push(element)
+                }
+            })
             dispatch({
                 type: AUCTION_LOAD_DATA,
                 payload: {
                     itemList: item.payload,
                     trackList: track.payload,
-                    auctionList: auction.payload,
+                    auctionList: _temp,
                 }
             });
         } catch (error) {
