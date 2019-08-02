@@ -8,3 +8,17 @@
 .btn-submit-white{border: none; font-size: 13px; background-color: transparent;color: white;font-weight: 600;}
 .body-grey{background-color: grey; padding-top: 10px; padding-bottom: 10px;}
 .body-blue{background-color: #464690; padding-top: 10px; padding-bottom: 10px;}
+
+@media only screen and (max-width: 1200px) {
+    .main-container .row {
+        flex-direction: row;
+    }
+
+    .body-red .col-md-3, .body-grey .col-md-3, .body-blue .col-md-3 {
+        width: 25%;
+    }
+
+    .body-red .col-md-6, .body-grey .col-md-6, .body-blue .col-md-6 {
+        width: 25%;
+    }
+}

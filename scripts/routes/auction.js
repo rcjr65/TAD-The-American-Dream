@@ -78,7 +78,7 @@ exports.get =  function(req, res) {
 exports.result =  function(req, res) {
     var Auction = mongoose.model('Auction', auctionSchema);
     var createAt = Math.round(new Date().getTime()/1000);
-    Auction.find({/*bidPrice:{$ne: 0}, expiry: {$gt: createAt}*/}, ['itemId', 'itemName', 'itemCategory', 'ownerGamerCode', 'ownerName', 'biderGamerCode', 'biderName', 'minPrice', 'bidPrice', 'buyPrice', 'oFlag', 'bFlag']).sort({'createdAt': 1}).exec(function(err, data){
+    Auction.find({$or: [{bidPrice:{$ne: 0}}, {expiry: {$lt: createAt}, bidPrice: 0}]}, ['itemId', 'itemName', 'itemCategory', 'ownerGamerCode', 'ownerName', 'biderGamerCode', 'biderName', 'minPrice', 'bidPrice', 'buyPrice', 'oFlag', 'bFlag']).sort({'createdAt': 1}).exec(function(err, data){
         if(err){
             return common.send(res, 400, '', err);
         }

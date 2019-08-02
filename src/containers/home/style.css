@@ -47,3 +47,37 @@ div.rt-th{
 .form-label {
     color: #ffffff;
 }
+
+@media only screen and (max-width: 1200px) {
+    .container {
+        display: flex;
+        flex-direction: column;
+    }
+
+    .govWrapper {
+        width: 100%;
+    }
+    
+    .ddWrapper {
+        width: 100%;
+        flex-direction: row;
+    }
+
+    .ddWrapper .box {
+        width: 30%;
+    }
+    .chatWrapper {
+        width: 100%;
+    }
+}
+
+@media only screen and (max-width: 768px) {
+    .ddWrapper {
+        width: 100%;
+        flex-direction: column;
+    }
+
+    .ddWrapper .box {
+        width: 100%;
+    }
+}
