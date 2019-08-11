@@ -43,6 +43,7 @@ import {
             return {
                 ...state,
                 lastWinningNumber: action.payload.lastWinningNumber,
+                ticketList: action.payload.ticketList,
             };  
         case LOTTERY_ERROR:
             alert(action.payload);

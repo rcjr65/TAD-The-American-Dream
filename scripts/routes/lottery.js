@@ -109,12 +109,19 @@ exports.setWinnerNumber =  function(req, res) {
         createdAt: createAt
     });
 
-    newTicket.save(function(err, result){
+    Ticket.deleteMany({}, function(err) {
         if(err){
             return common.send(res, 400, '', err);
         }
         else{
-            return common.send(res, 200, result, 'success');
+            newTicket.save(function(err, result){
+                if(err){
+                    return common.send(res, 400, '', err);
+                }
+                else{
+                    return common.send(res, 200, result, 'success');
+                }
+            })
         }
     })
 }

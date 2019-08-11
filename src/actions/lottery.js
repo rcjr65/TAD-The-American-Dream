@@ -53,10 +53,12 @@ export function setWinnerNumber(params) {
     return async (dispatch, getState) => {
         try {
             var winningNumbers = await ApiProvider(Backend_EndPoint + "api/lottery/setWinnerNumber", "POST", params);
+            var ticketList = await ApiProvider(Backend_EndPoint + "api/lottery/getPickData/", "GET",null);
             dispatch({
                 type: LOTTERY_UPDATE_WINNER,
                 payload: {
                     lastWinningNumber: winningNumbers.payload.winingNumbers,
+                    ticketList: ticketList.payload,
                 }
             });        
         } catch (error) {
