@@ -20,9 +20,9 @@ exports.post =  function(req, res) {
         return common.send(res, 401, '', 'user gender is undefined');
     }
     
-    if (req.body.password == undefined || req.body.password == '') {
-        return common.send(res, 401, '', 'user password is undefined');
-    }
+    // if (req.body.password == undefined || req.body.password == '') {
+    //     return common.send(res, 401, '', 'user password is undefined');
+    // }
     
     if (req.body.email == undefined || req.body.email == '') {
         return common.send(res, 401, '', 'user email is undefined');
@@ -54,7 +54,7 @@ exports.post =  function(req, res) {
                     name: req.body.name,
                     code: req.body.code,
                     gender: req.body.gender,
-                    password: req.body.password,
+                    // password: req.body.password,
                     email: req.body.email,
                     avatar: req.body.avatar,
                     state: req.body.state,
@@ -62,59 +62,67 @@ exports.post =  function(req, res) {
                     groupName: req.body.groupName,
                 });
                 await model.save();
-                
-                User.aggregate([
-                    {
-                        $match: {
-                            state: req.body.state
-                        }
-                    },
-                    { $group : { 
-                            '_id' : '$groupName',
-                            'count': { $sum:  1},
-                            'data' : {'$first' : '$$ROOT'}
-                        }
-                    },
-                    { $sort : {'count' : -1} },
-                    { $project : { 'groupName':'$data.groupName', 'numbersOfGroup':'$count' } }
-                ], function(err, data){
-                    if(err){
-                        return common.send(res, 400, '', err);
-                    }
-                    else{
-                        if(data.length > 0){
-                            var mostPopularGroup = data[0].groupName;
-                            var population = 0;
-                            data.forEach(element => {
-                                population += element.numbersOfGroup;                                
-                            });
-
-                            Governor.findOne({ stateCode: req.body.state }, async function ( err, _g){
-                                if(err){
-                                    return common.send(res, 400, '', err);
-                                }
-                                else{
-                                    if (_g == undefined || _g == null) {
-                                        return common.send(res, 300, '', 'Undefined user.');
-                                    } else {
-                                        _g.population = population;
-                                        _g.mostPopularGroup = mostPopularGroup;
-                                        await _g.save();
-                                        return common.send(res, 200, '', 'Success');                                                                     
-                                    }
-                                }
-                            })                            
-                        }
-                        else{
-                            return common.send(res, 200, [], 'Empty Data'); 
-                        }                
-                    }        
-                })
-
                 // return common.send(res, 200, '', 'Success');
             } else {
-                return common.send(res, 300, '', 'Already exists.');
+                _user.name = req.body.name
+                _user.code = req.body.code
+                _user.gender = req.body.gender
+                // _user.password = req.body.password
+                _user.email = req.body.email
+                _user.avatar = req.body.avatar
+                _user.state = req.body.state
+                _user.groupId = req.body.groupId
+                _user.groupName = req.body.groupName
+                await _user.save();
             }
+
+            User.aggregate([
+                {
+                    $match: {
+                        state: req.body.state
+                    }
+                },
+                { $group : { 
+                        '_id' : '$groupName',
+                        'count': { $sum:  1},
+                        'data' : {'$first' : '$$ROOT'}
+                    }
+                },
+                { $sort : {'count' : -1} },
+                { $project : { 'groupName':'$data.groupName', 'numbersOfGroup':'$count' } }
+            ], function(err, data){
+                if(err){
+                    return common.send(res, 400, '', err);
+                }
+                else{
+                    if(data.length > 0){
+                        var mostPopularGroup = data[0].groupName;
+                        var population = 0;
+                        data.forEach(element => {
+                            population += element.numbersOfGroup;                                
+                        });
+
+                        Governor.findOne({ stateCode: req.body.state }, async function ( err, _g){
+                            if(err){
+                                return common.send(res, 400, '', err);
+                            }
+                            else{
+                                if (_g == undefined || _g == null) {
+                                    return common.send(res, 300, '', 'Undefined user.');
+                                } else {
+                                    _g.population = population;
+                                    _g.mostPopularGroup = mostPopularGroup;
+                                    await _g.save();
+                                    return common.send(res, 200, '', 'Success');                                                                     
+                                }
+                            }
+                        })                            
+                    }
+                    else{
+                        return common.send(res, 200, [], 'Empty Data'); 
+                    }                
+                }        
+            })
         }
     })
 };
