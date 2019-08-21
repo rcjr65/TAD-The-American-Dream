@@ -44,8 +44,8 @@ class Lottery extends Component {
         this.setState({jackpot: nextProps.jackpot.value, payout: _payout.toFixed(2)});
     }
 
-    if(nextProps.balance !== this.props.balance){
-        this.setState({dreamBank: nextProps.balance})
+    if(nextProps.balance.balance !== this.props.balance.balance){
+        this.setState({dreamBank: nextProps.balance.balance})
     }
 
     if(nextProps.scratcherNumbers !== this.props.scratcherNumbers){
@@ -124,7 +124,7 @@ class Lottery extends Component {
   }
 
   saveDreamBank = () =>{
-    this.props.saveDreamBank(this.state.dreamBank);
+    this.props.saveDreamBank(this.props.balance.id, this.state.dreamBank);
     this.setState({isEditDreamBank: false});
   }
 

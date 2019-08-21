@@ -151,7 +151,8 @@ exports.bid =  function(req, res) {
                 var createAt = Math.round(new Date().getTime()/1000);
                 var expiredTime = parseInt(data.expiry, 10);
                 if( createAt < expiredTime){
-                    Auction.findOne({biderItemId : req.body.auctionId}).exec( function(err, topBidderData){
+                    
+                    Auction.findOne({biderItemId : req.body.auctionId.toString()}).exec( function(err, topBidderData){
                         if(err){
                             return common.send(res, 400, '', err);
                         }
@@ -165,7 +166,7 @@ exports.bid =  function(req, res) {
                                     biderName: req.body.biderName,
                                     buyPrice: data.buyPrice,
                                     biderGamerCode: req.body.biderGamerCode,
-                                    biderItemId: req.body.auctionId,
+                                    biderItemId: req.body.auctionId.toString(),
                                     ownerGamerCode: data.ownerGamerCode,
                                     ownerName: data.ownerName,
                                     minPrice: data.minPrice,
@@ -188,7 +189,7 @@ exports.bid =  function(req, res) {
                                     topBidderData.bidPrice = req.body.bidPrice;
                                     topBidderData.biderGamerCode = req.body.biderGamerCode;
                                     topBidderData.biderName = req.body.biderName;
-                                    topBidderData.biderItemId = req.body.auctionId;
+                                    topBidderData.biderItemId = req.body.auctionId.toString();
 
                                     topBidderData.save(function(err, result){
                                         if(err){

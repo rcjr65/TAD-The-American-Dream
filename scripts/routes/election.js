@@ -184,6 +184,10 @@ exports.edit = function(req, res) {
     if (req.body.candidacyCode == undefined) {
         return common.send(res, 401, '', 'candidacyCode is undefined');
     }
+    
+    if (req.body.candidacyName == undefined) {
+        return common.send(res, 401, '', 'candidacyName is undefined');
+    }
 
     VoteResult.findOne({ candidacyCode: req.body.candidacyCode.toUpperCase() }, async function ( err, _voteResult){
         if(err){
@@ -191,13 +195,20 @@ exports.edit = function(req, res) {
         }
         else{
             if (_voteResult == undefined || _voteResult == null) {
-                return common.send(res, 300, '', 'Undefined');
+                
+                var _model = new VoteResult({
+                    candidacyCode: req.body.candidacyCode.toUpperCase(),
+                    candidacyName: req.body.candidacyName,
+                    votes: req.body.votes
+                });
+                await _model.save();
+                return common.send(res, 200, _model, 'Success');
             }
             else {
                 _voteResult.votes = req.body.votes;
                 await _voteResult.save();
+                return common.send(res, 200, _voteResult, 'Success');
             }
-            return common.send(res, 200, '', 'Success');
         }
     })
 }

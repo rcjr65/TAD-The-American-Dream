@@ -115,16 +115,15 @@ export function setScratcherNumber(winingNumbers) {
     };
 }
 
-export function saveDreamBank(balance) {
+export function saveDreamBank(id, balance) {
 
     return async (dispatch, getState) => {
         try {
-            console.log({balance})
-            await ApiProvider(Backend_EndPoint + "api/lottery/updateDreamBankBalance", "POST", {balance});
+            var _balance = await ApiProvider(Backend_EndPoint + "api/lottery/updateDreamBankBalance", "POST", {id, balance});
             dispatch({
                 type: LOTTERY_UPDATE_DREAM_BANK,
                 payload: {
-                    balance: balance,
+                    balance: _balance.payload,
                 }
             });
         } catch (error) {

@@ -4,6 +4,7 @@ var mongoose = require('mongoose');
 
 var ticketSchema = require('../models/tickets').ticketSchema;
 var scratcherSchema = require('../models/scratchers').scratcherSchema;
+var dreammachineSchema = require('../models/dreammachines').dreammachineSchema;
 
 exports.sendPickData =  function(req, res) {
     var Ticket = mongoose.model('Ticket', ticketSchema);
@@ -384,26 +385,81 @@ exports.getScratcherWinnerData =  function(req, res) {
 }
 
 exports.getDreamBankBalance =  function(req, res) {
-    var ref = firebase.db.ref("/DreamSlot/Cash");
-    ref.once("value", function(snapshot) {
-        return common.send(res, 200, snapshot.val(), 'success');
-    }, function (errorObject) {
-        return common.send(res, 400, '', errorObject.code);
+    // var ref = firebase.db.ref("/DreamSlot/Cash");
+    // ref.once("value", function(snapshot) {
+    //     return common.send(res, 200, snapshot.val(), 'success');
+    // }, function (errorObject) {
+    //     return common.send(res, 400, '', errorObject.code);
+    // });
+    var DreamMachine = mongoose.model("DreamMachine", dreammachineSchema);
+    DreamMachine.findOne({}, function(err, data) {
+        if(err){
+            return common.send(res, 400, '', err);
+        }
+        else{
+            var params = {}
+            if (data == "undefined" || data == null) {
+                params = {
+                    id : mongoose.Types.ObjectId(),
+                    balance: 0
+                }
+            } else {
+                params = {
+                    id : data._id,
+                    balance: data.balance
+                }
+            }
+            return common.send(res, 200, params, 'success');
+        }
     });
 }
 
 exports.updateDreamBankBalance =  function(req, res) {
+    
+    var DreamMachine = mongoose.model("DreamMachine", dreammachineSchema);
+
     if (req.body.balance == undefined) {
         return common.send(res, 401, '', 'balance is undefined');
     }
 
-    var ref = firebase.db.ref("/DreamSlot");
-    ref.set({ Cash : parseFloat(req.body.balance)}, function (error) {
-        if (error) {
-            // The write failed...
-            return common.send(res, 400, '', error.code);
-        } else {
-            return common.send(res, 200, '', 'success');
+    if (req.body.id == undefined) {
+        return common.send(res, 401, '', 'id is undefined');
+    }
+    
+    DreamMachine.findOne({ _id: req.body.id }, async function(err, _dreamMachine) {
+        if(!err){
+            if (_dreamMachine == "undefined" || _dreamMachine == null) {
+                var nDreamMachine = new DreamMachine({
+                    balance: req.body.balance
+                });
+                await nDreamMachine.save();
+                var params = {
+                    id : nDreamMachine._id,
+                    balance: parseFloat(nDreamMachine.balance)
+                }
+                return common.send(res, 200, params, 'Success');
+            } else {
+                _dreamMachine.balance = req.body.balance;
+                await _dreamMachine.save();
+                var params = {
+                    id : _dreamMachine._id,
+                    balance: parseFloat(_dreamMachine.balance)
+                }
+                return common.send(res, 200, params, 'Success');
+            }            
+        }
+        else{
+            return common.send(res, 300, '', err);
         }
     });
+
+    // var ref = firebase.db.ref("/DreamSlot");
+    // ref.set({ Cash : parseFloat(req.body.balance)}, function (error) {
+    //     if (error) {
+    //         // The write failed...
+    //         return common.send(res, 400, '', error.code);
+    //     } else {
+    //         return common.send(res, 200, '', 'success');
+    //     }
+    // });
 }
