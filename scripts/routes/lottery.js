@@ -392,15 +392,19 @@ exports.getDreamBankBalance =  function(req, res) {
     //     return common.send(res, 400, '', errorObject.code);
     // });
     var DreamMachine = mongoose.model("DreamMachine", dreammachineSchema);
-    DreamMachine.findOne({}, function(err, data) {
+    DreamMachine.findOne({}, async function(err, data) {
         if(err){
             return common.send(res, 400, '', err);
         }
         else{
             var params = {}
             if (data == "undefined" || data == null) {
+                var nDreamMachine = new DreamMachine({
+                    balance: 0
+                });
+                await nDreamMachine.save();
                 params = {
-                    id : mongoose.Types.ObjectId(),
+                    id : nDreamMachine._id,
                     balance: 0
                 }
             } else {
