@@ -31,6 +31,7 @@ router.post("/election/edit", election.edit);
 router.get("/election/result", election.result);
 router.post("/election/setElectionPeriod", election.setPeriod);
 router.get("/election/getElectionPeriod", election.getPeriod);
+router.post("/election/add", election.add);
 
 router.post("/auction/bid", auction.bid);
 router.post("/auction/post", auction.post);
@@ -49,6 +50,7 @@ router.post("/lottery/sendScratcherWinnerData", lottery.sendScratcherWinnerData)
 router.get("/lottery/getScratcherWinnerData", lottery.getScratcherWinnerData);
 router.get("/lottery/getDreamBankBalance", lottery.getDreamBankBalance);
 router.post("/lottery/updateDreamBankBalance", lottery.updateDreamBankBalance);
+router.post("/lottery/addDreamBank", lottery.addDreamBankBalance);
 
 router.get("/tax/getGovTax", tax.getGovTax);
 router.post("/tax/setGovTax", tax.setGovTax);

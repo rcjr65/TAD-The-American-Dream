@@ -212,3 +212,43 @@ exports.edit = function(req, res) {
         }
     })
 }
+
+exports.add = function(req, res) {
+
+    var VoteResult = mongoose.model("VoteResult", voteResultSchema);
+    
+    if (req.body.votes == undefined) {
+        return common.send(res, 401, '', 'Vote Number is undefined');
+    }
+
+    if (req.body.candidacyCode == undefined) {
+        return common.send(res, 401, '', 'candidacyCode is undefined');
+    }
+    
+    if (req.body.candidacyName == undefined) {
+        return common.send(res, 401, '', 'candidacyName is undefined');
+    }
+
+    VoteResult.findOne({ candidacyCode: req.body.candidacyCode.toUpperCase() }, async function ( err, _voteResult){
+        if(err){
+            return common.send(res, 400, '', err);
+        }
+        else{
+            if (_voteResult == undefined || _voteResult == null) {
+                
+                var _model = new VoteResult({
+                    candidacyCode: req.body.candidacyCode.toUpperCase(),
+                    candidacyName: req.body.candidacyName,
+                    votes: parseInt(req.body.votes)
+                });
+                await _model.save();
+                return common.send(res, 200, _model, 'Success');
+            }
+            else {
+                _voteResult.votes += parseInt(req.body.votes);
+                await _voteResult.save();
+                return common.send(res, 200, _voteResult, 'Success');
+            }
+        }
+    })
+}

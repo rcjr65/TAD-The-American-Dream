@@ -463,3 +463,53 @@ exports.updateDreamBankBalance =  function(req, res) {
     //     }
     // });
 }
+
+exports.addDreamBankBalance =  function(req, res) {
+    
+    var DreamMachine = mongoose.model("DreamMachine", dreammachineSchema);
+
+    if (req.body.delta == undefined) {
+        return common.send(res, 401, '', 'delta is undefined');
+    }
+
+    if (req.body.id == undefined) {
+        return common.send(res, 401, '', 'id is undefined');
+    }
+    
+    DreamMachine.findOne({ _id: req.body.id }, async function(err, _dreamMachine) {
+        if(!err){
+            if (_dreamMachine == "undefined" || _dreamMachine == null) {
+                var nDreamMachine = new DreamMachine({
+                    balance: req.body.delta
+                });
+                await nDreamMachine.save();
+                var params = {
+                    id : nDreamMachine._id,
+                    balance: parseFloat(nDreamMachine.balance)
+                }
+                return common.send(res, 200, params, 'Success');
+            } else {
+                _dreamMachine.balance += parseFloat(req.body.delta);
+                await _dreamMachine.save();
+                var params = {
+                    id : _dreamMachine._id,
+                    balance: parseFloat(_dreamMachine.balance)
+                }
+                return common.send(res, 200, params, 'Success');
+            }            
+        }
+        else{
+            return common.send(res, 300, '', err);
+        }
+    });
+
+    // var ref = firebase.db.ref("/DreamSlot");
+    // ref.set({ Cash : parseFloat(req.body.balance)}, function (error) {
+    //     if (error) {
+    //         // The write failed...
+    //         return common.send(res, 400, '', error.code);
+    //     } else {
+    //         return common.send(res, 200, '', 'success');
+    //     }
+    // });
+}
