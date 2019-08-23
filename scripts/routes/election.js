@@ -217,16 +217,16 @@ exports.add = function(req, res) {
 
     var VoteResult = mongoose.model("VoteResult", voteResultSchema);
     
-    if (req.body.votes == undefined) {
-        return common.send(res, 401, '', 'Vote Number is undefined');
-    }
-
     if (req.body.candidacyCode == undefined) {
         return common.send(res, 401, '', 'candidacyCode is undefined');
     }
     
     if (req.body.candidacyName == undefined) {
         return common.send(res, 401, '', 'candidacyName is undefined');
+    }
+    
+    if (req.body.votes == undefined) {
+        return common.send(res, 401, '', 'Vote Number is undefined');
     }
 
     VoteResult.findOne({ candidacyCode: req.body.candidacyCode.toUpperCase() }, async function ( err, _voteResult){

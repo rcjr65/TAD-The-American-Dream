@@ -468,14 +468,14 @@ exports.addDreamBankBalance =  function(req, res) {
     
     var DreamMachine = mongoose.model("DreamMachine", dreammachineSchema);
 
-    if (req.body.delta == undefined) {
-        return common.send(res, 401, '', 'delta is undefined');
-    }
-
     if (req.body.id == undefined) {
         return common.send(res, 401, '', 'id is undefined');
     }
     
+    if (req.body.delta == undefined) {
+        return common.send(res, 401, '', 'delta is undefined');
+    }
+
     DreamMachine.findOne({ _id: req.body.id }, async function(err, _dreamMachine) {
         if(!err){
             if (_dreamMachine == "undefined" || _dreamMachine == null) {
