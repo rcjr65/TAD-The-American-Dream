@@ -28,7 +28,7 @@ exports.post =  function(req, res) {
         return common.send(res, 401, '', 'user email is undefined');
     }
     
-    if (req.body.avatar == undefined || req.body.avatar == '') {
+    if (req.body.avatar == undefined) {
         return common.send(res, 401, '', 'user avatar is undefined');
     }
     
@@ -36,11 +36,11 @@ exports.post =  function(req, res) {
         return common.send(res, 401, '', 'user state is undefined');
     }
     
-    if (req.body.groupId == undefined || req.body.groupId == 0) {
+    if (req.body.groupId == undefined) {
         return common.send(res, 401, '', 'user`s group id is undefined');
     }
     
-    if (req.body.groupName == undefined || req.body.groupName == '') {
+    if (req.body.groupName == undefined) {
         return common.send(res, 401, '', 'user`s group name is undefined');
     }
     
