@@ -122,7 +122,7 @@ exports.result =  function(req, res) {
 
 exports.bid =  function(req, res) {
     var Auction = mongoose.model("Auction", auctionSchema);
-    
+    var createAt = Math.round(new Date().getTime()/1000);
     if (req.body.bidPrice == undefined) {
         return common.send(res, 401, '', 'bidPrice is undefined');
     }
@@ -180,7 +180,16 @@ exports.bid =  function(req, res) {
                                         return common.send(res, 400, '', err);
                                     }
                                     else{
-                                        return common.send(res, 200, '', 'success');
+                                        // return common.send(res, 200, '', 'success');
+
+                                        Auction.find({$or: [{bidPrice:{$ne: 0}}, {expiry: {$lt: createAt}, bidPrice: 0}]}, ['itemId', 'itemName', 'itemCategory', 'ownerGamerCode', 'ownerName', 'biderGamerCode', 'biderName', 'minPrice', 'bidPrice', 'buyPrice', 'oFlag', 'bFlag']).sort({'createdAt': 1}).exec(function(_err, _data){
+                                            if(_err){
+                                                return common.send(res, 400, '', err);
+                                            }
+                                            else{
+                                                return common.send(res, 200, _data, 'success');
+                                            }
+                                        }); 
                                     }
                                 })
                             }
@@ -196,12 +205,28 @@ exports.bid =  function(req, res) {
                                             return common.send(res, 400, '', err);
                                         }
                                         else{
-                                            return common.send(res, 200, '', 'success');
+                                            // return common.send(res, 200, '', 'success');
+                                            Auction.find({$or: [{bidPrice:{$ne: 0}}, {expiry: {$lt: createAt}, bidPrice: 0}]}, ['itemId', 'itemName', 'itemCategory', 'ownerGamerCode', 'ownerName', 'biderGamerCode', 'biderName', 'minPrice', 'bidPrice', 'buyPrice', 'oFlag', 'bFlag']).sort({'createdAt': 1}).exec(function(_err, _data){
+                                                if(_err){
+                                                    return common.send(res, 400, '', err);
+                                                }
+                                                else{
+                                                    return common.send(res, 200, _data, 'success');
+                                                }
+                                            }); 
                                         }
                                     })
                                 }
                                 else{
-                                    return common.send(res, 200, '', 'success');
+                                    // return common.send(res, 200, '', 'success');
+                                    Auction.find({$or: [{bidPrice:{$ne: 0}}, {expiry: {$lt: createAt}, bidPrice: 0}]}, ['itemId', 'itemName', 'itemCategory', 'ownerGamerCode', 'ownerName', 'biderGamerCode', 'biderName', 'minPrice', 'bidPrice', 'buyPrice', 'oFlag', 'bFlag']).sort({'createdAt': 1}).exec(function(_err, _data){
+                                        if(_err){
+                                            return common.send(res, 400, '', err);
+                                        }
+                                        else{
+                                            return common.send(res, 200, _data, 'success');
+                                        }
+                                    }); 
                                 }                                
                             }
                         }
